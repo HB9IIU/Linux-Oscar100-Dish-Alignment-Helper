@@ -13,49 +13,37 @@ fi
 
 
 # Update system
-echo "🔄 Updating system packages..."
 sudo apt update && sudo apt upgrade -y
 
 # curl
-echo "📥 Installing curl..."
 sudo apt install curl -y
 
 # PyQt5 and SIP (Qt libraries)
-echo "📥 Installing PyQt5 and SIP..."
 sudo apt install -y python3-pyqt5 python3-pyqt5.qtquick python3-sip
 
 # SoapySDR base libraries + development headers + tools + Python bindings
-echo "📥 Installing SoapySDR base libraries..."
 sudo apt install -y libsoapysdr-dev soapysdr-tools python3-soapysdr
 
 # Common SoapySDR hardware drivers
-echo "📥 Installing all SoapySDR hardware drivers..."
 sudo apt install -y soapysdr-module-all
 
 # RTL-SDR support
-echo "📥 Installing RTL-SDR support..."
 sudo apt install -y rtl-sdr soapysdr-module-rtlsdr
 
 # HackRF support
-echo "📥 Installing HackRF support..."
 sudo apt install -y hackrf soapysdr-module-hackrf
 
 # Airspy support (R2/Mini)
-echo "📥 Installing Airspy support..."
 sudo apt install -y soapysdr-module-airspy
 
 # --- Create venv with system packages available
-echo "🐍 Creating Python virtual environment..."
 python3 -m venv --system-site-packages hb9iiu_dishaligner
 
 # --- Activate venv
-echo "✅ Activating virtual environment..."
 source hb9iiu_dishaligner/bin/activate
 
 # --- Install pip packages into venv
-echo "⬆️  Upgrading pip..."
 pip install --upgrade pip
-echo "📦 Installing pip packages (numpy, pyqtgraph)..."
 pip install numpy pyqtgraph
 
 echo
@@ -72,9 +60,7 @@ APP_DIR="$USER_HOME/hb9iiu_dishaligner"
 mkdir -p "$APP_DIR"
 
 cd "$APP_DIR"
-echo "📥 Downloading NBfinal.py..."
 curl -L -o NBfinal.py https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/NBfinal.py
-echo "📥 Downloading WBfinal.py..."
 curl -L -o WBfinal.py https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/WBfinal.py
 
 
@@ -84,7 +70,6 @@ ICON_PNG="$APP_DIR/HB9IIU_Aligner.png"
 
 
 # Write PNG icon from embedded base64
-echo "📦 Writing embedded PNG icon..."
 base64 -d > "$ICON_PNG" <<'EOF'
 iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAYAAAB/HSuDAAC8G2NhQlgAALwbanVtYgAAAB5qdW1k
 YzJwYQARABCAAACqADibcQNjMnBhAAAANw9qdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3Vy
@@ -25194,7 +25179,6 @@ DESKTOP_FILE="$USER_HOME/Desktop/HB9IIU Aligner"
 mkdir -p "$APP_DIR"
 
 # Write PNG icon from embedded base64
-echo "📦 Writing embedded PNG icon..."
 base64 -d > "$ICON_PNG" <<'EOF'
 iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAYAAAB/HSuDAAC8G2NhQlgAALwbanVtYgAAAB5qdW1k
 YzJwYQARABCAAACqADibcQNjMnBhAAAANw9qdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3Vy
@@ -50294,6 +50278,3 @@ rm -- "$0"
 echo "✅ Done"
 
 
-echo "✅ All steps completed successfully."
-echo "🧹 Cleaning up installer script..."
-rm -- "$0"
