@@ -71,8 +71,10 @@ class SDRWorker(QtCore.QThread):
             return
 
         print(f"[SDR] Opening {driver} with args: {args}")
-        sdr = SoapySDR.Device(args)
-
+        # build argument string e.g. "driver=rtlsdr,serial=00000001"
+        arg_list = [f"{k}={v}" for k, v in args.items()]
+        arg_str = ",".join(arg_list)
+        sdr = SoapySDR.Device(arg_str)
         # ---- Common setup ----
         try:
             sdr.setFrequencyCorrection(SOAPY_SDR_RX, 0, float(RTL_PPM))
