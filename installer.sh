@@ -50,7 +50,7 @@ mkdir -p "$APP_DIR"
 
 cd "$APP_DIR"
 curl -L -o NBfinal.py https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/NBfinal.py
-curl -L -o NBfinal.py https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/WBfinal.py
+curl -L -o WBfinal.py https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/WBfinal.py
 
 
 
