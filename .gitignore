@@ -1,0 +1,3 @@
+TMP/
+# Ignore JetBrains IDE project files
+.idea/
