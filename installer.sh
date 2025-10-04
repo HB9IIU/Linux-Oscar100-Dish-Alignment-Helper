@@ -50295,7 +50295,7 @@ echo "✅ Done"
 
 echo "✅ All steps completed successfully."
 echo "🧹 Cleaning up installer script..."
-(sleep 1; rm -- "$0") &
+(sleep 5; rm -- "$0") &
 exit 0
 
 
