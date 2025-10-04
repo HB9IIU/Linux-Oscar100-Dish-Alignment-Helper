@@ -46,8 +46,11 @@ USER_HOME="$HOME"
 APP_DIR="$USER_HOME/hb9iiu_dishaligner"
 mkdir -p "$APP_DIR"
 
-cp NBfinal.py APP_DIR
-cp WBfinal.py APP_DIR
+cd "$APP_DIR"
+
+wget https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/NBfinal.py
+wget https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/WBfinal.py
+
 
 
 ICON_PNG="$APP_DIR/HB9IIU_Aligner.png"
@@ -50266,7 +50269,7 @@ if pgrep -x pcmanfm >/dev/null 2>&1; then
 fi
 
 cd ~
-rm -r Linux-Oscar100-Dish-Alignment-Helper
+rm installer.sh
 echo "✅ Done"
 
 
