@@ -50265,12 +50265,8 @@ if pgrep -x pcmanfm >/dev/null 2>&1; then
   pcmanfm --reconfigure >/dev/null 2>&1 || true
 fi
 
-echo "✅ Launcher: $DESKTOP_FILE"
-echo "🖼  Icon: $ICON_PNG"
-
 cd ~
 rm -r Linux-Oscar100-Dish-Alignment-Helper
-
 echo "✅ Done"
 
 
