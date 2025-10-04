@@ -4,6 +4,9 @@ set -e
 # Update system
 sudo apt update && sudo apt upgrade -y
 
+# curl
+sudo apt install curl -y
+
 # PyQt5 and SIP (Qt libraries)
 sudo apt install -y python3-pyqt5 python3-pyqt5.qtquick python3-sip
 
@@ -21,7 +24,6 @@ sudo apt install -y hackrf soapysdr-module-hackrf
 
 # Airspy support (R2/Mini)
 sudo apt install -y soapysdr-module-airspy
-
 
 # --- Create venv with system packages available
 python3 -m venv --system-site-packages hb9iiu_dishaligner
@@ -47,9 +49,8 @@ APP_DIR="$USER_HOME/hb9iiu_dishaligner"
 mkdir -p "$APP_DIR"
 
 cd "$APP_DIR"
-
-wget https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/NBfinal.py
-wget https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/WBfinal.py
+curl -L -o NBfinal.py https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/NBfinal.py
+curl -L -o NBfinal.py https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/WBfinal.py
 
 
 
