@@ -145,8 +145,13 @@ class SpectrumViewer(QtWidgets.QWidget):
         self.fc_nominal_hz  = self.nb_bpsk_if_nom * 1e6
 
         # ---- Fullscreen UI
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
         self.showFullScreen()
+
+        # Force exact screen geometry (fixes right margin issue)
+        screen = QtWidgets.QApplication.primaryScreen()
+        rect = screen.geometry()
+        self.setGeometry(rect)
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(2, 2, 2, 2)
@@ -159,6 +164,11 @@ class SpectrumViewer(QtWidgets.QWidget):
         self.plot.setLabel("bottom", "Frequency (MHz)")
         self.plot.setLabel("left", "SNR (dB)")
         layout.addWidget(self.plot)
+        # Force axis text and lines to solid white
+        for axis in ("bottom", "left"):
+            ax = self.plot.getAxis(axis)
+            ax.setTextPen(pg.mkPen(color=(255, 255, 255)))  # tick labels
+            ax.setPen(pg.mkPen(color=(255, 255, 255)))  # axis line + ticks
 
         # Custom ticks
         ax = self.plot.getAxis('bottom')
