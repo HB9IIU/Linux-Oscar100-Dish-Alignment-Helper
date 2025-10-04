@@ -25157,11 +25157,6 @@ if pgrep -x pcmanfm >/dev/null 2>&1; then
   pcmanfm --reconfigure >/dev/null 2>&1 || true
 fi
 
-cd ~
-rm Linux-Oscar100-Dish-Alignment-Helper
-
-
-
 
 # Absolute paths
 USER_HOME="$HOME"
