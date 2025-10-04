@@ -6,6 +6,7 @@ import pyqtgraph as pg
 import SoapySDR
 from SoapySDR import *
 
+
 # -------------------------- USER SETTINGS --------------------------
 NB_LOWER_CW_DL  = 10489.500   # MHz
 NB_BPSK_DL      = 10489.750   # MHz

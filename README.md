@@ -21,3 +21,6 @@ curl -L -o installer.sh \
   https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/installer.sh
 chmod 777 installer.sh
 ./installer.sh
+
+
+
