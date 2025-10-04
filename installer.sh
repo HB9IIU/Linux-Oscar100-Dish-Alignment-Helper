@@ -1,6 +1,17 @@
 #!/bin/bash
 set -e
 
+# Delete Previous possible installation
+cd ~
+
+if [ -d "hb9iiu_dishaligner" ]; then
+    echo "Removing old hb9iiu_dishaligner directory..."
+    rm -rf hb9iiu_dishaligner/
+else
+    echo "No existing hb9iiu_dishaligner directory found."
+fi
+
+
 # Update system
 sudo apt update && sudo apt upgrade -y
 
