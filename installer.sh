@@ -22,7 +22,8 @@ sudo apt install curl -y
 
 # PyQt5 and SIP (Qt libraries)
 echo "📥 Installing PyQt5 and SIP..."
-sudo apt install -y python3-pyqt5 python3-pyqt5.qtquick python3-sip
+sudo apt install -y python3-pyqt5 python3-pyqt5.qtquick python3-pyqt5.sip
+
 
 # SoapySDR base libraries + development headers + tools + Python bindings
 echo "📥 Installing SoapySDR base libraries..."
