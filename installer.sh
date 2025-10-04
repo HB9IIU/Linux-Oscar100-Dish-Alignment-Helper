@@ -50296,4 +50296,5 @@ echo "✅ Done"
 
 echo "✅ All steps completed successfully."
 echo "🧹 Cleaning up installer script..."
+exit 0
 rm -- "$0"
