@@ -9,7 +9,6 @@ from SoapySDR import *
 
 pg.setConfigOptions(antialias=True)  # smoother lines
 
-
 class SDRWorker(QtCore.QThread):
     new_data = QtCore.pyqtSignal(np.ndarray)
 
