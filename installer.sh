@@ -50214,7 +50214,7 @@ smk2kTQAAAAASUVORK5CYII=
 EOF
 
 # Create launcher NARROW BAND
-cat > "$DESKTOP_FILE" <<EOF
+cat > "$DESKTOP_FILE_NB" <<EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
@@ -50227,9 +50227,9 @@ Categories=Utility;
 EOF
 
 # Make launcher executable
-chmod +x "$DESKTOP_FILE"
+chmod +x "$DESKTOP_FILE_NB"
 if command -v gio >/dev/null 2>&1; then
-  gio set "$DESKTOP_FILE" "metadata::trusted" true || true
+  gio set "$DESKTOP_FILE_NB" "metadata::trusted" true || true
 fi
 
 # Refresh PCManFM if running
@@ -50237,11 +50237,9 @@ if pgrep -x pcmanfm >/dev/null 2>&1; then
   pcmanfm --reconfigure >/dev/null 2>&1 || true
 fi
 
-echo "✅ Launcher: $DESKTOP_FILE"
-echo "🖼  Icon: $ICON_PNG"
 
 # Create launcher WIDE BAND
-cat > "$DESKTOP_FILE" <<EOF
+cat > "$DESKTOP_FILE_WB" <<EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
@@ -50254,9 +50252,9 @@ Categories=Utility;
 EOF
 
 # Make launcher executable
-chmod +x "$DESKTOP_FILE"
+chmod +x "$DESKTOP_FILE_WB"
 if command -v gio >/dev/null 2>&1; then
-  gio set "$DESKTOP_FILE" "metadata::trusted" true || true
+  gio set "$DESKTOP_FILE_WB" "metadata::trusted" true || true
 fi
 
 # Refresh PCManFM if running
