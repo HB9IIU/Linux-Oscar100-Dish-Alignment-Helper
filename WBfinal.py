@@ -24,19 +24,22 @@ class SDRWorker(QtCore.QThread):
         hackrf_devs = [d for d in devs if str(d.get("driver", "")).lower() == "hackrf"]
 
         if airspy_devs:
-            args = {"driver": "airspy"}
+            arg_str = "driver=airspy"
             sdr_type = "airspy"
         elif rtl_devs:
-            args = {"driver": "rtlsdr"}
+            arg_str = "driver=rtlsdr"
             sdr_type = "rtlsdr"
         elif hackrf_devs:
-            args = {"driver": "hackrf"}
+            arg_str = "driver=hackrf"
             sdr_type = "hackrf"
         else:
             print("No SDR detected!")
             return
 
-        sdr = SoapySDR.Device(args)
+        print(f"[SDR] Opening {sdr_type} with '{arg_str}'")
+        sdr = SoapySDR.Device(arg_str)
+
+
         sdr.setSampleRate(SOAPY_SDR_RX, 0, self.fs)
         actual_fs = sdr.getSampleRate(SOAPY_SDR_RX, 0)
         print(f"Requested fs={self.fs/1e6:.3f} MHz, actual fs={actual_fs/1e6:.3f} MHz")
