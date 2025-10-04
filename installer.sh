@@ -50262,8 +50262,8 @@ if pgrep -x pcmanfm >/dev/null 2>&1; then
   pcmanfm --reconfigure >/dev/null 2>&1 || true
 fi
 
-cd ~
-rm installer.sh
+echo "Cleaning up..."
+rm -- "$0"
 echo "✅ Done"
 
 
