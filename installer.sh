@@ -419,6 +419,43 @@ if command -v gio >/dev/null 2>&1; then
   gio set "$DESKTOP_FILE" metadata::trusted true || true
 fi
 echo "✅ Desktop launcher created at $DESKTOP_FILE"
+
+
+# ------------------------------------------------------------
+# Step 14: Install Hamlib + GPIO libraries for encoder control
+# ------------------------------------------------------------
+echo "📥 Installing Hamlib (rigctl) and Python GPIO libraries..."
+
+# Hamlib (rigctl) - build from source if not available in repo
+if ! command -v rigctl >/dev/null 2>&1; then
+  echo "🔧 Hamlib not found, building from source..."
+  cd "$HOME"
+  rm -rf hamlib
+  git clone https://git.code.sf.net/p/hamlib/code hamlib
+  cd hamlib
+  ./bootstrap
+  ./configure --prefix=/usr/local
+  make -j$(nproc)
+  sudo make install
+  sudo ldconfig
+  echo "✅ Hamlib built and installed"
+else
+  echo "✅ Hamlib already installed"
+fi
+
+# Python GPIO library for encoder
+sudo apt install -y python3-gpiozero
+python3 -c "import gpiozero" && echo "✅ gpiozero installed"
+
+# Verify rigctl
+if command -v rigctl >/dev/null 2>&1; then
+  echo "✅ rigctl available: $(rigctl -V | head -n 1)"
+else
+  echo "❌ ERROR: rigctl not found!"
+fi
+
+
+
 # --- print elapsed time ---
 duration=$SECONDS
 echo "⏱️ Elapsed time: $(($duration / 3600))h $((($duration % 3600) / 60))m $(($duration % 60))s"
