@@ -102,9 +102,10 @@ sudo make install
 sudo ldconfig
 echo "Installation complete."
 
-echo "Step 9: Checking installed version..."
+echo "Step 9: Verifying SDR++ installation..."
 if command -v sdrpp >/dev/null 2>&1; then
-  sdrpp --version
+  echo "SDR++ binary found at: $(command -v sdrpp)"
+  sdrpp --help 2>&1 | head -n 1
 else
   echo "ERROR: SDR++ not found in PATH!"
 fi
