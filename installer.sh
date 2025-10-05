@@ -222,22 +222,21 @@ echo "📥 Downloading WBfinal.py..."
 curl -L -o "$APP_DIR/WBfinal.py" \
   https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/WBfinal.py
 
+
+
 echo "✅ DishAligner scripts ready in $APP_DIR"
 
 # ------------------------------------------------------------
-# Final message
+# Step 10: Add custom icons + desktop launchers for Aligner tools
 # ------------------------------------------------------------
-echo
-echo "🎉 Installation complete!"
-echo "👉 SDR++ is ready to launch from the desktop icon or by running 'sdrpp'"
-echo "👉 DishAligner scripts (NBfinal.py / WBfinal.py) are in $APP_DIR"
-
+APP_DIR="$HOME/hb9iiu_dishaligner"
+DESKTOP_DIR="$HOME/Desktop"
+mkdir -p "$DESKTOP_DIR"
 
 ICON_PNG="$APP_DIR/HB9IIU_Aligner.png"
+DESKTOP_FILE_NB="$DESKTOP_DIR/HB9IIU_Aligner_NB.desktop"
+DESKTOP_FILE_WB="$DESKTOP_DIR/HB9IIU_Aligner_WB.desktop"
 
-
-
-# Write PNG icon from embedded base64
 echo "📦 Writing embedded PNG icon..."
 base64 -d > "$ICON_PNG" <<'EOF'
 iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAYAAAB/HSuDAAC8G2NhQlgAALwbanVtYgAAAB5qdW1k
@@ -50394,74 +50393,69 @@ fl3SN3ru+wzIeA7+HVZVzx/D23rXJdzSwwCV51mQHfzykumm9fB4zrAocGwfUXmwa3Jn6fcfK6h3
 smk2kTQAAAAASUVORK5CYII=
 EOF
 
-# Create launcher NARROW BAND
+# --- Narrow Band launcher ---
+echo "🖥️ Creating Narrow Band launcher..."
 cat > "$DESKTOP_FILE_NB" <<EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=HB9IIU Aligner
-Comment=HB9IIU Aligner
+Name=HB9IIU Aligner (Narrow Band)
+Comment=HB9IIU Dish Aligner - NB
 Exec=$APP_DIR/bin/python3 $APP_DIR/NBfinal.py
 Icon=$ICON_PNG
 Terminal=false
 Categories=Utility;
 EOF
-
-# Make launcher executable
 chmod +x "$DESKTOP_FILE_NB"
-if command -v gio >/dev/null 2>&1; then
-  gio set "$DESKTOP_FILE_NB" "metadata::trusted" true || true
-fi
+command -v gio >/dev/null 2>&1 && gio set "$DESKTOP_FILE_NB" "metadata::trusted" true || true
 
-# Refresh PCManFM if running
-if pgrep -x pcmanfm >/dev/null 2>&1; then
-  pcmanfm --reconfigure >/dev/null 2>&1 || true
-fi
-
-
-# Create launcher WIDE BAND
+# --- Wide Band launcher ---
+echo "🖥️ Creating Wide Band launcher..."
 cat > "$DESKTOP_FILE_WB" <<EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=HB9IIU Aligner
-Comment=HB9IIU Aligner
+Name=HB9IIU Aligner (Wide Band)
+Comment=HB9IIU Dish Aligner - WB
 Exec=$APP_DIR/bin/python3 $APP_DIR/WBfinal.py
 Icon=$ICON_PNG
 Terminal=false
 Categories=Utility;
 EOF
-
-# Make launcher executable
 chmod +x "$DESKTOP_FILE_WB"
-if command -v gio >/dev/null 2>&1; then
-  gio set "$DESKTOP_FILE_WB" "metadata::trusted" true || true
-fi
+command -v gio >/dev/null 2>&1 && gio set "$DESKTOP_FILE_WB" "metadata::trusted" true || true
 
-# Refresh PCManFM if running
+# Refresh PCManFM desktop if running
 if pgrep -x pcmanfm >/dev/null 2>&1; then
+  echo "🔄 Refreshing PCManFM desktop..."
   pcmanfm --reconfigure >/dev/null 2>&1 || true
 fi
 
-echo "Cleaning up..."
-rm -- "$0"
-echo "✅ Done"
-
-
-#acticate VNC
+# ------------------------------------------------------------
+# Step 11: Enable VNC service
+# ------------------------------------------------------------
+echo "🔌 Enabling VNC server..."
 sudo raspi-config nonint do_vnc 0
 
+# ------------------------------------------------------------
+# Step 12: Inject default SDR++ config
+# ------------------------------------------------------------
+echo "📥 Downloading SDR++ default config..."
+curl -L -o /tmp/sdrppConfig.zip \
+  https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/sdrppConfig.zip
 
-echo "📥 Downloading sdrpp default config"
-curl -L -o sdrppConfig.zip https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/sdrppConfig.zip
+echo "🧹 Resetting SDR++ config directory..."
+rm -rf ~/.config/sdrpp
+mkdir -p ~/.config/sdrpp
 
+echo "📦 Unpacking config into ~/.config/sdrpp..."
+unzip -o /tmp/sdrppConfig.zip -d ~/.config/sdrpp >/dev/null
 
-
-
+# ------------------------------------------------------------
+# Final cleanup
+# ------------------------------------------------------------
 echo "✅ All steps completed successfully."
 echo "🧹 Cleaning up installer script..."
 (sleep 5; rm -- "$0") &
+
 exit 0
-
-
-
