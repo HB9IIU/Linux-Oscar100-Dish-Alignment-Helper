@@ -23,6 +23,11 @@ sudo apt install -y cmake build-essential pkg-config git
 echo "📥 Installing volk..."
 sudo apt install -y libvolk-dev
 
+# libzstd
+echo "📥 libzstd developpment package..."
+sudo apt install -y libzstd-dev
+
+
 
 # GLFW3 development package
 echo "📥 Install GLFW3 development package"
