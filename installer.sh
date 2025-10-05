@@ -5,7 +5,7 @@ set -e
 # Author: HB9IIU (enhanced install script)
 # Target: Raspberry Pi (64-bit)
 # ============================================
-
+SECONDS=0
 echo "🚀 Starting SDR++ and DishAligner Helper installation..."
 
 # ------------------------------------------------------------
@@ -310,7 +310,7 @@ mkdir -p ~/.config/sdrpp
 echo "📦 Unpacking config into ~/.config/sdrpp..."
 unzip -oq /tmp/sdrppConfig.zip -d ~/.config/sdrpp
 # ------------------------------------------------------------
-# Step 13: Build and install GQRX with RTL-SDR, HackRF, Airspy, PlutoSDR support
+# Step 13: Build and install GQRX with RTL-SDR, HackRF, Airspy, Soapy PlutoSDR support
 # ------------------------------------------------------------
 echo "=== Building GQRX SDR receiver ==="
 
@@ -332,14 +332,13 @@ echo "✅ GQRX dependencies installed"
 # ------------------------------------------------------------
 # Step 13a: Build gr-osmosdr with multiple backends
 # ------------------------------------------------------------
-cd "$HOME"
-if [ -d "gr-osmosdr" ]; then
-    echo "🧹 Removing old gr-osmosdr source..."
-    rm -rf gr-osmosdr
-fi
+echo "🧹 Removing any system gr-osmosdr package..."
+sudo apt remove -y --purge gr-osmosdr || true
 
+cd "$HOME"
+rm -rf gr-osmosdr
 echo "📥 Cloning gr-osmosdr..."
-git clone https://git.osmocom.org/gr-osmosdr
+git clone https://gitea.osmocom.org/sdr/gr-osmosdr.git
 cd gr-osmosdr
 mkdir build && cd build
 
@@ -349,7 +348,7 @@ cmake .. -DENABLE_DEFAULT=OFF \
   -DENABLE_HACKRF=ON \
   -DENABLE_AIRSPY=ON \
   -DENABLE_AIRSPYHF=ON \
-  -DENABLE_PLUTOSDR=ON
+  -DENABLE_SOAPY=ON
 
 echo "⚙️ Building gr-osmosdr..."
 make -j$(nproc)
@@ -358,14 +357,25 @@ sudo ldconfig
 echo "✅ gr-osmosdr built and installed"
 
 # ------------------------------------------------------------
-# Step 13b: Build GQRX
+# Step 13b: Build SoapyPlutoSDR for Pluto support
 # ------------------------------------------------------------
 cd "$HOME"
-if [ -d "gqrx" ]; then
-    echo "🧹 Removing old GQRX source..."
-    rm -rf gqrx
-fi
+rm -rf SoapyPlutoSDR
+echo "📥 Cloning SoapyPlutoSDR..."
+git clone https://github.com/pothosware/SoapyPlutoSDR.git
+cd SoapyPlutoSDR
+mkdir build && cd build
+cmake ..
+make -j$(nproc)
+sudo make install
+sudo ldconfig
+echo "✅ SoapyPlutoSDR built and installed"
 
+# ------------------------------------------------------------
+# Step 13c: Build GQRX
+# ------------------------------------------------------------
+cd "$HOME"
+rm -rf gqrx
 echo "📥 Cloning GQRX source..."
 git clone https://github.com/csete/gqrx.git
 cd gqrx
@@ -381,13 +391,12 @@ sudo ldconfig
 echo "✅ GQRX built and installed"
 
 # ------------------------------------------------------------
-# Step 13c: Desktop launcher for GQRX
+# Step 13d: Desktop launcher for GQRX
 # ------------------------------------------------------------
 echo "🖥️ Creating Desktop launcher for GQRX..."
 mkdir -p "$HOME/Desktop"
 DESKTOP_FILE="$HOME/Desktop/GQRX.desktop"
 
-# Use system GQRX icon if available, otherwise fallback to generic
 ICON_PATH="/usr/share/icons/hicolor/48x48/apps/gqrx.png"
 if [ ! -f "$ICON_PATH" ]; then
   ICON_PATH="multimedia-volume-control"
@@ -409,14 +418,11 @@ chmod +x "$DESKTOP_FILE"
 if command -v gio >/dev/null 2>&1; then
   gio set "$DESKTOP_FILE" metadata::trusted true || true
 fi
-
 echo "✅ Desktop launcher created at $DESKTOP_FILE"
-
-# ------------------------------------------------------------
-# Final cleanup
-# ------------------------------------------------------------
-echo "✅ All steps completed successfully."
-echo "🧹 Cleaning up installer script..."
-(sleep 5; rm -- "\$0") &
-
-exit 0
+# --- print elapsed time ---
+duration=$SECONDS
+echo "⏱️ Elapsed time: $(($duration / 3600))h $((($duration % 3600) / 60))m $(($duration % 60))s"
+# --- reboot notice ---
+echo "Rebooting in 5 seconds..."
+sleep 5
+sudo reboot
