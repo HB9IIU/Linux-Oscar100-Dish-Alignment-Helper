@@ -11,7 +11,6 @@ else
     echo "No existing hb9iiu_dishaligner directory found."
 fi
 
-
 # Update system
 echo "🔄 Updating system packages..."
 sudo apt update && sudo apt upgrade -y
@@ -23,7 +22,6 @@ sudo apt install curl -y
 # PyQt5 and SIP (Qt libraries)
 echo "📥 Installing PyQt5 and SIP..."
 sudo apt install -y python3-pyqt5 python3-pyqt5.qtquick python3-pyqt5.sip
-
 
 # SoapySDR base libraries + development headers + tools + Python bindings
 echo "📥 Installing SoapySDR base libraries..."
@@ -44,6 +42,17 @@ sudo apt install -y hackrf soapysdr-module-hackrf
 # Airspy support (R2/Mini)
 echo "📥 Installing Airspy support..."
 sudo apt install -y soapysdr-module-airspy
+
+
+
+echo "📥 Downloading SDRplayAPI"
+curl -L -o WBfinal.py https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/WBfinal.py
+
+
+
+
+
+
 
 # --- Create venv with system packages available
 echo "🐍 Creating Python virtual environment..."
