@@ -117,21 +117,23 @@ echo "Build directory removed."
 
 echo "Step 11: Creating Desktop icon..."
 DESKTOP_FILE=~/Desktop/SDRpp.desktop
+ICON_FILE=/home/daniel/SDRPlusPlus/root/res/icons/sdrpp.png
+
 mkdir -p ~/Desktop
+
 cat > "$DESKTOP_FILE" <<EOF
 [Desktop Entry]
 Name=SDR++
 Comment=Launch SDR++
-Exec=sdrpp
-Icon=utilities-terminal
+Exec=sdrpp --autostart
+Icon=$ICON_FILE
 Terminal=false
 Type=Application
 Categories=AudioVideo;HamRadio;
 EOF
-chmod +x "$DESKTOP_FILE"
-echo "Desktop icon created at $DESKTOP_FILE"
 
-echo "=== SDR++ build and installation completed successfully! ==="
+chmod +x "$DESKTOP_FILE"
+echo "Desktop icon created at $DESKTOP_FILE (using icon: $ICON_FILE)"
 
 exit
 
