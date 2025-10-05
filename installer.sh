@@ -234,8 +234,8 @@ DESKTOP_DIR="$HOME/Desktop"
 mkdir -p "$DESKTOP_DIR"
 
 ICON_PNG="$APP_DIR/HB9IIU_Aligner.png"
-DESKTOP_FILE_NB="$DESKTOP_DIR/HB9IIU_Aligner_NB.desktop"
-DESKTOP_FILE_WB="$DESKTOP_DIR/HB9IIU_Aligner_WB.desktop"
+DESKTOP_FILE_NB="$DESKTOP_DIR/HB9IIU NB Monitor.desktop"
+DESKTOP_FILE_WB="$DESKTOP_DIR/HB9IIU WB Monitor.desktop"
 
 echo "📦 Writing embedded PNG icon..."
 base64 -d > "$ICON_PNG" <<'EOF'
@@ -50393,41 +50393,47 @@ fl3SN3ru+wzIeA7+HVZVzx/D23rXJdzSwwCV51mQHfzykumm9fB4zrAocGwfUXmwa3Jn6fcfK6h3
 smk2kTQAAAAASUVORK5CYII=
 EOF
 
-# --- Narrow Band launcher ---
+# Narrow Band launcher
 echo "🖥️ Creating Narrow Band launcher..."
 cat > "$DESKTOP_FILE_NB" <<EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=HB9IIU Aligner (Narrow Band)
-Comment=HB9IIU Dish Aligner - NB
+Name=HB9IIU NB Monitor
+Comment=HB9IIU Dish Aligner - Narrow Band
 Exec=$APP_DIR/bin/python3 $APP_DIR/NBfinal.py
 Icon=$ICON_PNG
 Terminal=false
 Categories=Utility;
 EOF
-chmod +x "$DESKTOP_FILE_NB"
-command -v gio >/dev/null 2>&1 && gio set "$DESKTOP_FILE_NB" "metadata::trusted" true || true
 
-# --- Wide Band launcher ---
+chmod +x "$DESKTOP_FILE_NB"
+if command -v gio >/dev/null 2>&1; then
+  gio set "$DESKTOP_FILE_NB" metadata::trusted true || true
+fi
+
+# Wide Band launcher
 echo "🖥️ Creating Wide Band launcher..."
 cat > "$DESKTOP_FILE_WB" <<EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=HB9IIU Aligner (Wide Band)
-Comment=HB9IIU Dish Aligner - WB
+Name=HB9IIU WB Monitor
+Comment=HB9IIU Dish Aligner - Wide Band
 Exec=$APP_DIR/bin/python3 $APP_DIR/WBfinal.py
 Icon=$ICON_PNG
 Terminal=false
 Categories=Utility;
 EOF
-chmod +x "$DESKTOP_FILE_WB"
-command -v gio >/dev/null 2>&1 && gio set "$DESKTOP_FILE_WB" "metadata::trusted" true || true
 
-# Refresh PCManFM desktop if running
+chmod +x "$DESKTOP_FILE_WB"
+if command -v gio >/dev/null 2>&1; then
+  gio set "$DESKTOP_FILE_WB" metadata::trusted true || true
+fi
+
+# Refresh desktop if PCManFM is running
 if pgrep -x pcmanfm >/dev/null 2>&1; then
-  echo "🔄 Refreshing PCManFM desktop..."
+  echo "🔄 Refreshing PCManFM..."
   pcmanfm --reconfigure >/dev/null 2>&1 || true
 fi
 
