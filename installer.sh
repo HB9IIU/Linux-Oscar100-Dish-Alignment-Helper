@@ -309,12 +309,114 @@ mkdir -p ~/.config/sdrpp
 
 echo "📦 Unpacking config into ~/.config/sdrpp..."
 unzip -oq /tmp/sdrppConfig.zip -d ~/.config/sdrpp
+# ------------------------------------------------------------
+# Step 13: Build and install GQRX with RTL-SDR, HackRF, Airspy, PlutoSDR support
+# ------------------------------------------------------------
+echo "=== Building GQRX SDR receiver ==="
+
+echo "📥 Installing GQRX dependencies..."
+sudo apt install -y \
+  gnuradio \
+  libboost-all-dev \
+  qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools \
+  libqt5svg5-dev libqwt-qt5-dev \
+  libpulse-dev portaudio19-dev \
+  libusb-1.0-0-dev \
+  libhackrf-dev \
+  libairspy-dev \
+  libairspyhf-dev \
+  libiio-dev libad9361-dev \
+  librtlsdr-dev
+echo "✅ GQRX dependencies installed"
+
+# ------------------------------------------------------------
+# Step 13a: Build gr-osmosdr with multiple backends
+# ------------------------------------------------------------
+cd "$HOME"
+if [ -d "gr-osmosdr" ]; then
+    echo "🧹 Removing old gr-osmosdr source..."
+    rm -rf gr-osmosdr
+fi
+
+echo "📥 Cloning gr-osmosdr..."
+git clone https://git.osmocom.org/gr-osmosdr
+cd gr-osmosdr
+mkdir build && cd build
+
+echo "🛠️ Configuring gr-osmosdr..."
+cmake .. -DENABLE_DEFAULT=OFF \
+  -DENABLE_RTL=ON \
+  -DENABLE_HACKRF=ON \
+  -DENABLE_AIRSPY=ON \
+  -DENABLE_AIRSPYHF=ON \
+  -DENABLE_PLUTOSDR=ON
+
+echo "⚙️ Building gr-osmosdr..."
+make -j$(nproc)
+sudo make install
+sudo ldconfig
+echo "✅ gr-osmosdr built and installed"
+
+# ------------------------------------------------------------
+# Step 13b: Build GQRX
+# ------------------------------------------------------------
+cd "$HOME"
+if [ -d "gqrx" ]; then
+    echo "🧹 Removing old GQRX source..."
+    rm -rf gqrx
+fi
+
+echo "📥 Cloning GQRX source..."
+git clone https://github.com/csete/gqrx.git
+cd gqrx
+mkdir build && cd build
+
+echo "🛠️ Configuring GQRX..."
+cmake ..
+
+echo "⚙️ Building GQRX..."
+make -j$(nproc)
+sudo make install
+sudo ldconfig
+echo "✅ GQRX built and installed"
+
+# ------------------------------------------------------------
+# Step 13c: Desktop launcher for GQRX
+# ------------------------------------------------------------
+echo "🖥️ Creating Desktop launcher for GQRX..."
+mkdir -p "$HOME/Desktop"
+DESKTOP_FILE="$HOME/Desktop/GQRX.desktop"
+
+# Use system GQRX icon if available, otherwise fallback to generic
+ICON_PATH="/usr/share/icons/hicolor/48x48/apps/gqrx.png"
+if [ ! -f "$ICON_PATH" ]; then
+  ICON_PATH="multimedia-volume-control"
+fi
+
+cat > "$DESKTOP_FILE" <<EOF
+[Desktop Entry]
+Version=1.0
+Name=GQRX SDR
+Comment=Launch GQRX SDR Receiver
+Exec=gqrx
+Icon=$ICON_PATH
+Terminal=false
+Type=Application
+Categories=AudioVideo;HamRadio;
+EOF
+
+chmod +x "$DESKTOP_FILE"
+if command -v gio >/dev/null 2>&1; then
+  gio set "$DESKTOP_FILE" metadata::trusted true || true
+fi
+
+echo "✅ Desktop launcher created at $DESKTOP_FILE"
 
 # ------------------------------------------------------------
 # Final cleanup
 # ------------------------------------------------------------
 echo "✅ All steps completed successfully."
 echo "🧹 Cleaning up installer script..."
-(sleep 5; rm -- "$0") &
+(sleep 5; rm -- "\$0") &
 
 exit 0
