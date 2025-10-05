@@ -15,6 +15,12 @@ fi
 echo "🔄 Updating system packages..."
 sudo apt update && sudo apt upgrade -y
 
+# cmake
+echo "📥 Installing CMALE..."
+sudo apt install -y cmake build-essential pkg-config git
+
+
+
 # curl
 echo "📥 Installing curl..."
 sudo apt install curl -y
