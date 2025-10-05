@@ -231,20 +231,20 @@ echo "✅ DishAligner scripts ready in $APP_DIR"
 # ------------------------------------------------------------
 APP_DIR="$HOME/hb9iiu_dishaligner"
 DESKTOP_DIR="$HOME/Desktop"
-mkdir -p "$DESKTOP_DIR"
-
-echo "📥 Downloading Icon..."
-curl -L -o "$APP_DIR/HB9IIU_Aligner.png" \
-  https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/HB9IIU_Aligner.png
-
-
+mkdir -p "$APP_DIR" "$DESKTOP_DIR"
 
 ICON_PNG="$APP_DIR/HB9IIU_Aligner.png"
+
+echo "📥 Downloading application icon..."
+curl -fsSL -o "$ICON_PNG" \
+  https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/HB9IIU_Aligner.png
+
 DESKTOP_FILE_NB="$DESKTOP_DIR/HB9IIU NB Monitor.desktop"
 DESKTOP_FILE_WB="$DESKTOP_DIR/HB9IIU WB Monitor.desktop"
 
-
+# ------------------------------------------------------------
 # Narrow Band launcher
+# ------------------------------------------------------------
 echo "🖥️ Creating Narrow Band launcher..."
 cat > "$DESKTOP_FILE_NB" <<EOF
 [Desktop Entry]
@@ -263,7 +263,9 @@ if command -v gio >/dev/null 2>&1; then
   gio set "$DESKTOP_FILE_NB" metadata::trusted true || true
 fi
 
+# ------------------------------------------------------------
 # Wide Band launcher
+# ------------------------------------------------------------
 echo "🖥️ Creating Wide Band launcher..."
 cat > "$DESKTOP_FILE_WB" <<EOF
 [Desktop Entry]
@@ -298,7 +300,7 @@ sudo raspi-config nonint do_vnc 0
 # Step 12: Inject default SDR++ config
 # ------------------------------------------------------------
 echo "📥 Downloading SDR++ default config..."
-curl -L -o /tmp/sdrppConfig.zip \
+curl -fsSL -o /tmp/sdrppConfig.zip \
   https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/sdrppConfig.zip
 
 echo "🧹 Resetting SDR++ config directory..."
@@ -306,7 +308,7 @@ rm -rf ~/.config/sdrpp
 mkdir -p ~/.config/sdrpp
 
 echo "📦 Unpacking config into ~/.config/sdrpp..."
-unzip -o /tmp/sdrppConfig.zip -d ~/.config/sdrpp >/dev/null
+unzip -oq /tmp/sdrppConfig.zip -d ~/.config/sdrpp
 
 # ------------------------------------------------------------
 # Final cleanup
