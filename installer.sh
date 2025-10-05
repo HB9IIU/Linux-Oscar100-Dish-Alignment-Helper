@@ -64,10 +64,10 @@ sudo apt install -y libiio-dev libad9361-dev
 
 
 cd ~
-# Clean up old SoapyPlutoSDR if it exists
+# Clean up old SoapyPlutoSDR if it exists (force, no dialogue)
 if [ -d ~/SoapyPlutoSDR ]; then
   echo "🧹 Removing old SoapyPlutoSDR source..."
-  sudo rm -rf ~/SoapyPlutoSDR
+  rm -rf ~/SoapyPlutoSDR
 fi
 
 
