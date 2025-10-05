@@ -52,6 +52,7 @@ chmod 777 SDRplay_RSP_API-Linux-3.15.2-modified.run
 sudo ./SDRplay_RSP_API-Linux-3.15.2-modified.run
 rm SDRplay_RSP_API-Linux-3.15.2-modified.run
 
+
 echo "=== SDR++ Build Script for Raspberry Pi ==="
 echo "Step 1: Cleaning old build directory (if any)..."
 if [ -d ~/SDRPlusPlus/build ]; then
@@ -112,6 +113,22 @@ echo "Step 10: Cleaning up build directory..."
 cd ~
 sudo rm -rf ~/SDRPlusPlus/build
 echo "Build directory removed."
+
+echo "Step 11: Creating Desktop icon..."
+DESKTOP_FILE=~/Desktop/SDRpp.desktop
+mkdir -p ~/Desktop
+cat > "$DESKTOP_FILE" <<EOF
+[Desktop Entry]
+Name=SDR++
+Comment=Launch SDR++
+Exec=sdrpp
+Icon=utilities-terminal
+Terminal=false
+Type=Application
+Categories=AudioVideo;HamRadio;
+EOF
+chmod +x "$DESKTOP_FILE"
+echo "Desktop icon created at $DESKTOP_FILE"
 
 echo "=== SDR++ build and installation completed successfully! ==="
 
