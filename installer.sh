@@ -47,6 +47,7 @@ sudo apt install -y soapysdr-module-airspy
 
 echo "📥 Downloading SDRplayAPI"
 curl -L -o WBfinal.py https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/SDRplay_RSP_API-Linux-3.15.2-modified.run
+echo "📥 Installing SDRPlayAPI"
 chmod 777 SDRplay_RSP_API-Linux-3.15.2-modified.run
 sudo ./SDRplay_RSP_API-Linux-3.15.2-modified.run
 exit
