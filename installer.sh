@@ -31,6 +31,11 @@ sudo apt install -y libzstd-dev
 echo "📥 Install the RtAudio development package."
 sudo apt install -y librtaudio-dev
 
+# librtlsdr-dev
+echo "📥 Install the RTL-SDR development package"
+sudo apt install -y librtlsdr-dev
+
+
 # GLFW3 development package
 echo "📥 Install GLFW3 development package"
 sudo apt install -y libglfw3-dev libglew-dev libgl1-mesa-dev
