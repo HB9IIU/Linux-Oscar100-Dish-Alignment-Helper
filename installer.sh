@@ -23,6 +23,12 @@ sudo apt install -y cmake build-essential pkg-config git
 echo "📥 Install GLFW3 development package"
 sudo apt install -y libglfw3-dev libglew-dev libgl1-mesa-dev
 
+
+#Install the FFTW3 development package:
+echo "📥 Install the FFTW3 development package"
+sudo apt install -y libfftw3-dev
+
+
 # curl
 echo "📥 Installing curl..."
 sudo apt install curl -y
@@ -51,6 +57,29 @@ sudo apt install -y hackrf soapysdr-module-hackrf
 echo "📥 Installing Airspy support..."
 sudo apt install -y soapysdr-module-airspy
 
+# PlutoSDR support
+echo "📥 Installing PlutoSDR support..."
+
+sudo apt install -y libiio-dev libad9361-dev
+
+
+cd ~
+# Clean up old SoapyPlutoSDR if it exists
+if [ -d ~/SoapyPlutoSDR ]; then
+  echo "🧹 Removing old SoapyPlutoSDR source..."
+  sudo rm -rf ~/SoapyPlutoSDR
+fi
+
+
+git clone https://github.com/pothosware/SoapyPlutoSDR.git
+cd SoapyPlutoSDR
+mkdir build && cd build
+cmake ..
+make -j$(nproc)
+sudo make install
+sudo ldconfig
+cd ~
+rm -r SoapyPlutoSDR
 
 
 echo "📥 Downloading SDRplayAPI"
