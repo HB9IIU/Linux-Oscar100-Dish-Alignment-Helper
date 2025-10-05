@@ -79,7 +79,7 @@ make -j$(nproc)
 sudo make install
 sudo ldconfig
 cd ~
-rm -r SoapyPlutoSDR
+ rm -rf ~/SoapyPlutoSDR
 
 
 echo "📥 Downloading SDRplayAPI"
