@@ -27,7 +27,9 @@ sudo apt install -y libvolk-dev
 echo "📥 libzstd developpment package..."
 sudo apt install -y libzstd-dev
 
-
+# RtAudio
+echo "📥 Install the RtAudio development package."
+sudo apt install -y librtaudio-dev
 
 # GLFW3 development package
 echo "📥 Install GLFW3 development package"
