@@ -19,6 +19,11 @@ sudo apt update && sudo apt upgrade -y
 echo "📥 Installing cmake..."
 sudo apt install -y cmake build-essential pkg-config git
 
+# volk
+echo "📥 Installing volk..."
+sudo apt install -y libvolk-dev
+
+
 # GLFW3 development package
 echo "📥 Install GLFW3 development package"
 sudo apt install -y libglfw3-dev libglew-dev libgl1-mesa-dev
