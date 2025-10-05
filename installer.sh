@@ -16,10 +16,12 @@ echo "🔄 Updating system packages..."
 sudo apt update && sudo apt upgrade -y
 
 # cmake
-echo "📥 Installing CMALE..."
+echo "📥 Installing cmake..."
 sudo apt install -y cmake build-essential pkg-config git
 
-
+# GLFW3 development package
+echo "📥 Install GLFW3 development package"
+sudo apt install -y libglfw3-dev libglew-dev libgl1-mesa-dev
 
 # curl
 echo "📥 Installing curl..."
