@@ -1,182 +1,184 @@
 #!/bin/bash
 set -e
+# ============================================
+# SDR++ + SDRplay + Soapy drivers + DishAligner Helper Installer
+# Author: HB9IIU (enhanced install script)
+# Target: Raspberry Pi (64-bit)
+# ============================================
 
-# Delete Previous possible installation
-cd ~
+echo "🚀 Starting SDR++ and DishAligner Helper installation..."
 
+# ------------------------------------------------------------
+# Step 0: Clean up previous installation directory if exists
+# ------------------------------------------------------------
+cd "$HOME"
 if [ -d "hb9iiu_dishaligner" ]; then
-    echo "Removing old hb9iiu_dishaligner directory..."
+    echo "🧹 Removing old hb9iiu_dishaligner directory..."
     rm -rf hb9iiu_dishaligner/
 else
-    echo "No existing hb9iiu_dishaligner directory found."
+    echo "ℹ️  No existing hb9iiu_dishaligner directory found."
 fi
 
-# Update system
+# ------------------------------------------------------------
+# Step 1: Update system
+# ------------------------------------------------------------
 echo "🔄 Updating system packages..."
-sudo apt update && sudo apt upgrade -y
+sudo DEBIAN_FRONTEND=noninteractive apt update && sudo apt upgrade -y
 
-# cmake
-echo "📥 Installing cmake..."
+# ------------------------------------------------------------
+# Step 2: Install build tools and core dependencies
+# ------------------------------------------------------------
+echo "📥 Installing build tools (cmake, make, pkg-config, git)..."
 sudo apt install -y cmake build-essential pkg-config git
+cmake --version && git --version
 
-# volk
-echo "📥 Installing volk..."
+echo "📥 Installing VOLK (Vector Optimized Library of Kernels)..."
 sudo apt install -y libvolk-dev
+dpkg -s libvolk-dev >/dev/null && echo "✅ volk installed"
 
-# libzstd
-echo "📥 libzstd developpment package..."
+echo "📥 Installing Zstandard compression library..."
 sudo apt install -y libzstd-dev
+dpkg -s libzstd-dev >/dev/null && echo "✅ libzstd installed"
 
-# RtAudio
-echo "📥 Install the RtAudio development package."
+echo "📥 Installing RtAudio (audio I/O)..."
 sudo apt install -y librtaudio-dev
+dpkg -s librtaudio-dev >/dev/null && echo "✅ librtaudio installed"
 
-# librtlsdr-dev
-echo "📥 Install the RTL-SDR development package"
+echo "📥 Installing RTL-SDR development package..."
 sudo apt install -y librtlsdr-dev
+dpkg -s librtlsdr-dev >/dev/null && echo "✅ librtlsdr-dev installed"
 
-
-# GLFW3 development package
-echo "📥 Install GLFW3 development package"
+echo "📥 Installing GLFW3 + OpenGL support..."
 sudo apt install -y libglfw3-dev libglew-dev libgl1-mesa-dev
+dpkg -s libglfw3-dev >/dev/null && echo "✅ GLFW3 installed"
 
-
-#Install the FFTW3 development package:
-echo "📥 Install the FFTW3 development package"
+echo "📥 Installing FFTW3 (fast Fourier transforms)..."
 sudo apt install -y libfftw3-dev
+dpkg -s libfftw3-dev >/dev/null && echo "✅ fftw3 installed"
 
-
-# curl
 echo "📥 Installing curl..."
-sudo apt install curl -y
+sudo apt install -y curl
+curl --version | head -n 1
 
-# PyQt5 and SIP (Qt libraries)
-echo "📥 Installing PyQt5 and SIP..."
+echo "📥 Installing PyQt5 (Qt GUI support for Python)..."
 sudo apt install -y python3-pyqt5 python3-pyqt5.qtquick python3-pyqt5.sip
+python3 -c "import PyQt5" && echo "✅ PyQt5 installed"
 
-# SoapySDR base libraries + development headers + tools + Python bindings
-echo "📥 Installing SoapySDR base libraries..."
+# ------------------------------------------------------------
+# Step 3: Install SoapySDR and SDR hardware modules
+# ------------------------------------------------------------
+echo "📥 Installing SoapySDR base libraries + tools + Python bindings..."
 sudo apt install -y libsoapysdr-dev soapysdr-tools python3-soapysdr
+soapy_config_info --info | head -n 3
 
-# Common SoapySDR hardware drivers
 echo "📥 Installing all SoapySDR hardware drivers..."
 sudo apt install -y soapysdr-module-all
 
-# RTL-SDR support
-echo "📥 Installing RTL-SDR support..."
+echo "📥 Installing RTL-SDR runtime support..."
 sudo apt install -y rtl-sdr soapysdr-module-rtlsdr
 
-# HackRF support
-echo "📥 Installing HackRF support..."
+echo "📥 Installing HackRF runtime support..."
 sudo apt install -y hackrf soapysdr-module-hackrf
 
-# Airspy support (R2/Mini)
-echo "📥 Installing Airspy support..."
+echo "📥 Installing Airspy runtime support..."
 sudo apt install -y soapysdr-module-airspy
 
-# PlutoSDR support
-echo "📥 Installing PlutoSDR support..."
-
+echo "📥 Installing PlutoSDR support (libiio + libad9361)..."
 sudo apt install -y libiio-dev libad9361-dev
 
-cd ~
-
-# Clean up old SoapyPlutoSDR if it exists (absolutely no prompts)
-if [ -d ~/SoapyPlutoSDR ]; then
+# ------------------------------------------------------------
+# Step 4: Build SoapyPlutoSDR from source
+# ------------------------------------------------------------
+cd "$HOME"
+if [ -d "$HOME/SoapyPlutoSDR" ]; then
   echo "🧹 Removing old SoapyPlutoSDR source..."
-  sudo chattr -R -i ~/SoapyPlutoSDR 2>/dev/null || true   # remove immutable if set
-  sudo rm -rf --no-preserve-root ~/SoapyPlutoSDR
+  sudo chattr -R -i "$HOME/SoapyPlutoSDR" 2>/dev/null || true
+  sudo rm -rf --no-preserve-root "$HOME/SoapyPlutoSDR"
 fi
 
-# Clone fresh
-git clone https://github.com/pothosware/SoapyPlutoSDR.git ~/SoapyPlutoSDR
+echo "📥 Cloning SoapyPlutoSDR..."
+git clone https://github.com/pothosware/SoapyPlutoSDR.git "$HOME/SoapyPlutoSDR"
 
-# Build and install
-cd ~/SoapyPlutoSDR
+echo "🛠️ Building SoapyPlutoSDR..."
+cd "$HOME/SoapyPlutoSDR"
 mkdir -p build && cd build
-cmake ..
-make -j$(nproc)
+cmake .. && make -j$(nproc)
 sudo make install
 sudo ldconfig
 
-# Cleanup to save space
-cd ~
-sudo rm -rf --no-preserve-root ~/SoapyPlutoSDR
+echo "🧹 Cleaning SoapyPlutoSDR build sources..."
+cd "$HOME"
+sudo rm -rf --no-preserve-root "$HOME/SoapyPlutoSDR"
 
+# ------------------------------------------------------------
+# Step 5: Install SDRplay API
+# ------------------------------------------------------------
+echo "📥 Downloading SDRplay API (modified installer)..."
+curl -L -o SDRplay_RSP_API-Linux-3.15.2-modified.run \
+  https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/SDRplay_RSP_API-Linux-3.15.2-modified.run
 
-echo "📥 Downloading SDRplayAPI"
-curl -L -o SDRplay_RSP_API-Linux-3.15.2-modified.run https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/SDRplay_RSP_API-Linux-3.15.2-modified.run
-echo "📥 Installing SDRPlayAPI"
-chmod 777 SDRplay_RSP_API-Linux-3.15.2-modified.run
+echo "⚙️ Installing SDRplay API..."
+chmod +x SDRplay_RSP_API-Linux-3.15.2-modified.run
 sudo ./SDRplay_RSP_API-Linux-3.15.2-modified.run
 rm SDRplay_RSP_API-Linux-3.15.2-modified.run
+echo "✅ SDRplay API installed"
 
-
+# ------------------------------------------------------------
+# Step 6: Build SDR++ from source
+# ------------------------------------------------------------
 echo "=== SDR++ Build Script for Raspberry Pi ==="
-echo "Step 1: Cleaning old build directory (if any)..."
-if [ -d ~/SDRPlusPlus/build ]; then
-  sudo rm -rf ~/SDRPlusPlus/build
-  echo "Old build directory removed."
-else
-  echo "No previous build directory found."
+
+if [ -d "$HOME/SDRPlusPlus/build" ]; then
+  echo "🧹 Removing old SDR++ build directory..."
+  rm -rf "$HOME/SDRPlusPlus/build"
 fi
 
-echo "Step 2: Installing dependencies..."
-sudo apt update
+echo "📥 Installing SDR++ extra dependencies..."
 sudo apt install -y libhackrf-dev libairspy-dev libiio-dev libad9361-dev
-echo "Dependencies installed."
 
-echo "Step 3: Removing old SDRPlusPlus source (if any)..."
-if [ -d ~/SDRPlusPlus ]; then
-  rm -rf ~/SDRPlusPlus
-  echo "Old source removed."
-else
-  echo "No previous source found."
+if [ -d "$HOME/SDRPlusPlus" ]; then
+  echo "🧹 Removing old SDR++ source..."
+  rm -rf "$HOME/SDRPlusPlus"
 fi
 
-echo "Step 4: Cloning SDR++ from GitHub..."
-cd ~
-git clone https://github.com/AlexandreRouma/SDRPlusPlus.git SDRPlusPlus
-cd SDRPlusPlus
-echo "Source cloned."
+echo "📥 Cloning SDR++ source..."
+git clone https://github.com/AlexandreRouma/SDRPlusPlus.git "$HOME/SDRPlusPlus"
 
-echo "Step 5: Creating build directory..."
+echo "🛠️ Configuring SDR++ with CMake..."
+cd "$HOME/SDRPlusPlus"
 mkdir build && cd build
-
-echo "Step 6: Running CMake configuration..."
 cmake .. \
   -DOPT_BUILD_AIRSPY_SOURCE=ON \
   -DOPT_BUILD_AIRSPYHF_SOURCE=OFF \
   -DOPT_BUILD_HACKRF_SOURCE=ON \
   -DOPT_BUILD_PLUTOSDR_SOURCE=ON \
   -DOPT_BUILD_SDRPLAY_SOURCE=ON
-echo "CMake configuration complete."
 
-echo "Step 7: Building SDR++..."
+echo "⚙️ Building SDR++..."
 make -j$(nproc)
-echo "Build finished."
 
-echo "Step 8: Installing SDR++..."
+echo "📦 Installing SDR++..."
 sudo make install
 sudo ldconfig
-echo "Installation complete."
+echo "✅ SDR++ installed"
 
-echo "Step 9: Verifying SDR++ installation..."
+echo "🔎 Verifying SDR++ installation..."
 if command -v sdrpp >/dev/null 2>&1; then
-  echo "SDR++ binary found at: $(command -v sdrpp)"
-  sdrpp --help 2>&1 | head -n 1
+  echo "✅ SDR++ binary found at: $(command -v sdrpp)"
+  sdrpp --help | head -n 1
 else
-  echo "ERROR: SDR++ not found in PATH!"
+  echo "❌ ERROR: SDR++ not found in PATH!"
 fi
 
-echo "Step 10: Creating Desktop icon..."
-mkdir -p ~/Desktop
+# ------------------------------------------------------------
+# Step 7: Install SDR++ desktop shortcut
+# ------------------------------------------------------------
+echo "🖥️ Creating Desktop launcher for SDR++..."
+mkdir -p "$HOME/Desktop"
+DESKTOP_FILE="$HOME/Desktop/SDR++.desktop"
+ICON_FILE="$HOME/SDRPlusPlus/root/res/icons/sdrpp.png"
 
-TMP_DESKTOP_FILE=~/Desktop/tmp_sdrpp.desktop
-FINAL_DESKTOP_FILE=~/Desktop/SDR++.desktop
-ICON_FILE=/home/daniel/SDRPlusPlus/root/res/icons/sdrpp.png
-
-cat > "$TMP_DESKTOP_FILE" <<EOF
+cat > "$DESKTOP_FILE" <<EOF
 [Desktop Entry]
 Name=SDR++
 Comment=Launch SDR++
@@ -187,52 +189,48 @@ Type=Application
 Categories=AudioVideo;HamRadio;
 EOF
 
-# Rename to final filename
-mv "$TMP_DESKTOP_FILE" "$FINAL_DESKTOP_FILE"
-chmod +x "$FINAL_DESKTOP_FILE"
+chmod +x "$DESKTOP_FILE"
+gio set "$DESKTOP_FILE" metadata::trusted true 2>/dev/null || true
+echo "✅ Desktop launcher created at $DESKTOP_FILE"
 
-# Mark as trusted so label shows as "SDR++"
-gio set "$FINAL_DESKTOP_FILE" metadata::trusted true 2>/dev/null || true
+# ------------------------------------------------------------
+# Step 8: Setup Python virtual environment for DishAligner
+# ------------------------------------------------------------
+echo "🐍 Creating Python virtual environment for DishAligner..."
+python3 -m venv --system-site-packages "$HOME/hb9iiu_dishaligner"
 
-echo "Desktop icon created at $FINAL_DESKTOP_FILE (label: SDR++)"
-
-
-
-
-
-# --- Create venv with system packages available
-echo "🐍 Creating Python virtual environment..."
-python3 -m venv --system-site-packages hb9iiu_dishaligner
-
-# --- Activate venv
 echo "✅ Activating virtual environment..."
-source hb9iiu_dishaligner/bin/activate
+source "$HOME/hb9iiu_dishaligner/bin/activate"
 
-# --- Install pip packages into venv
-echo "⬆️  Upgrading pip..."
+echo "⬆️ Upgrading pip..."
 pip install --upgrade pip
-echo "📦 Installing pip packages (numpy, pyqtgraph)..."
+
+echo "📦 Installing Python packages (numpy, pyqtgraph)..."
 pip install numpy pyqtgraph
 
-echo
-echo "✅ Environment ready."
-
-
-# Absolute paths
-USER_HOME="$HOME"
-APP_DIR="$USER_HOME/hb9iiu_dishaligner"
+# ------------------------------------------------------------
+# Step 9: Fetch DishAligner Python scripts
+# ------------------------------------------------------------
+APP_DIR="$HOME/hb9iiu_dishaligner"
 mkdir -p "$APP_DIR"
 
-USER_HOME="$HOME"
-APP_DIR="$USER_HOME/hb9iiu_dishaligner"
-mkdir -p "$APP_DIR"
-
-cd "$APP_DIR"
 echo "📥 Downloading NBfinal.py..."
-curl -L -o NBfinal.py https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/NBfinal.py
-echo "📥 Downloading WBfinal.py..."
-curl -L -o WBfinal.py https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/WBfinal.py
+curl -L -o "$APP_DIR/NBfinal.py" \
+  https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/NBfinal.py
 
+echo "📥 Downloading WBfinal.py..."
+curl -L -o "$APP_DIR/WBfinal.py" \
+  https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/WBfinal.py
+
+echo "✅ DishAligner scripts ready in $APP_DIR"
+
+# ------------------------------------------------------------
+# Final message
+# ------------------------------------------------------------
+echo
+echo "🎉 Installation complete!"
+echo "👉 SDR++ is ready to launch from the desktop icon or by running 'sdrpp'"
+echo "👉 DishAligner scripts (NBfinal.py / WBfinal.py) are in $APP_DIR"
 
 
 ICON_PNG="$APP_DIR/HB9IIU_Aligner.png"
