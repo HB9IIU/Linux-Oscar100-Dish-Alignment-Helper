@@ -51,6 +51,70 @@ echo "📥 Installing SDRPlayAPI"
 chmod 777 SDRplay_RSP_API-Linux-3.15.2-modified.run
 sudo ./SDRplay_RSP_API-Linux-3.15.2-modified.run
 rm SDRplay_RSP_API-Linux-3.15.2-modified.run
+
+echo "=== SDR++ Build Script for Raspberry Pi ==="
+echo "Step 1: Cleaning old build directory (if any)..."
+if [ -d ~/SDRPlusPlus/build ]; then
+  sudo rm -rf ~/SDRPlusPlus/build
+  echo "Old build directory removed."
+else
+  echo "No previous build directory found."
+fi
+
+echo "Step 2: Installing dependencies..."
+sudo apt update
+sudo apt install -y libhackrf-dev libairspy-dev libiio-dev libad9361-dev
+echo "Dependencies installed."
+
+echo "Step 3: Removing old SDRPlusPlus source (if any)..."
+if [ -d ~/SDRPlusPlus ]; then
+  rm -rf ~/SDRPlusPlus
+  echo "Old source removed."
+else
+  echo "No previous source found."
+fi
+
+echo "Step 4: Cloning SDR++ from GitHub..."
+cd ~
+git clone https://github.com/AlexandreRouma/SDRPlusPlus.git SDRPlusPlus
+cd SDRPlusPlus
+echo "Source cloned."
+
+echo "Step 5: Creating build directory..."
+mkdir build && cd build
+
+echo "Step 6: Running CMake configuration..."
+cmake .. \
+  -DOPT_BUILD_AIRSPY_SOURCE=ON \
+  -DOPT_BUILD_AIRSPYHF_SOURCE=OFF \
+  -DOPT_BUILD_HACKRF_SOURCE=ON \
+  -DOPT_BUILD_PLUTOSDR_SOURCE=ON \
+  -DOPT_BUILD_SDRPLAY_SOURCE=ON
+echo "CMake configuration complete."
+
+echo "Step 7: Building SDR++..."
+make -j$(nproc)
+echo "Build finished."
+
+echo "Step 8: Installing SDR++..."
+sudo make install
+sudo ldconfig
+echo "Installation complete."
+
+echo "Step 9: Checking installed version..."
+if command -v sdrpp >/dev/null 2>&1; then
+  sdrpp --version
+else
+  echo "ERROR: SDR++ not found in PATH!"
+fi
+
+echo "Step 10: Cleaning up build directory..."
+cd ~
+sudo rm -rf ~/SDRPlusPlus/build
+echo "Build directory removed."
+
+echo "=== SDR++ build and installation completed successfully! ==="
+
 exit
 
 
