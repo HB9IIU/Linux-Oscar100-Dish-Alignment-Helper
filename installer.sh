@@ -137,8 +137,6 @@ gio set "$FINAL_DESKTOP_FILE" metadata::trusted true 2>/dev/null || true
 
 echo "Desktop icon created at $FINAL_DESKTOP_FILE (label: SDR++)"
 
-exit
-
 
 
 
