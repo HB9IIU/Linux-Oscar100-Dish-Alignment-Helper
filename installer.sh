@@ -50449,6 +50449,17 @@ echo "Cleaning up..."
 rm -- "$0"
 echo "✅ Done"
 
+
+#acticate VNC
+sudo raspi-config nonint do_vnc 0
+
+
+echo "📥 Downloading sdrpp default config"
+curl -L -o sdrppConfig.zip https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/sdrppConfig.zip
+
+
+
+
 echo "✅ All steps completed successfully."
 echo "🧹 Cleaning up installer script..."
 (sleep 5; rm -- "$0") &
