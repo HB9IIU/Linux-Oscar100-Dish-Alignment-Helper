@@ -62,24 +62,29 @@ echo "📥 Installing PlutoSDR support..."
 
 sudo apt install -y libiio-dev libad9361-dev
 
-
 cd ~
-# Clean up old SoapyPlutoSDR if it exists (force, no dialogue)
+
+# Clean up old SoapyPlutoSDR if it exists (absolutely no prompts)
 if [ -d ~/SoapyPlutoSDR ]; then
   echo "🧹 Removing old SoapyPlutoSDR source..."
-  rm -rf ~/SoapyPlutoSDR
+  sudo chattr -R -i ~/SoapyPlutoSDR 2>/dev/null || true   # remove immutable if set
+  sudo rm -rf --no-preserve-root ~/SoapyPlutoSDR
 fi
 
+# Clone fresh
+git clone https://github.com/pothosware/SoapyPlutoSDR.git ~/SoapyPlutoSDR
 
-git clone https://github.com/pothosware/SoapyPlutoSDR.git
-cd SoapyPlutoSDR
-mkdir build && cd build
+# Build and install
+cd ~/SoapyPlutoSDR
+mkdir -p build && cd build
 cmake ..
 make -j$(nproc)
 sudo make install
 sudo ldconfig
+
+# Cleanup to save space
 cd ~
- rm -rf ~/SoapyPlutoSDR
+sudo rm -rf --no-preserve-root ~/SoapyPlutoSDR
 
 
 echo "📥 Downloading SDRplayAPI"
