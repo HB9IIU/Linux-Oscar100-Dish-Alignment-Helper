@@ -110,18 +110,14 @@ else
   echo "ERROR: SDR++ not found in PATH!"
 fi
 
-echo "Step 10: Cleaning up build directory..."
-cd ~
-sudo rm -rf ~/SDRPlusPlus/build
-echo "Build directory removed."
-
-echo "Step 11: Creating Desktop icon..."
-DESKTOP_FILE=~/Desktop/SDRpp.desktop
-ICON_FILE=/home/daniel/SDRPlusPlus/root/res/icons/sdrpp.png
-
+echo "Step 10: Creating Desktop icon..."
 mkdir -p ~/Desktop
 
-cat > "$DESKTOP_FILE" <<EOF
+TMP_DESKTOP_FILE=~/Desktop/tmp_sdrpp.desktop
+FINAL_DESKTOP_FILE=~/Desktop/SDR++.desktop
+ICON_FILE=/home/daniel/SDRPlusPlus/root/res/icons/sdrpp.png
+
+cat > "$TMP_DESKTOP_FILE" <<EOF
 [Desktop Entry]
 Name=SDR++
 Comment=Launch SDR++
@@ -132,8 +128,14 @@ Type=Application
 Categories=AudioVideo;HamRadio;
 EOF
 
-chmod +x "$DESKTOP_FILE"
-echo "Desktop icon created at $DESKTOP_FILE (using icon: $ICON_FILE)"
+# Rename to final filename
+mv "$TMP_DESKTOP_FILE" "$FINAL_DESKTOP_FILE"
+chmod +x "$FINAL_DESKTOP_FILE"
+
+# Mark as trusted so label shows as "SDR++"
+gio set "$FINAL_DESKTOP_FILE" metadata::trusted true 2>/dev/null || true
+
+echo "Desktop icon created at $FINAL_DESKTOP_FILE (label: SDR++)"
 
 exit
 
