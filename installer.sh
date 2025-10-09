@@ -307,8 +307,8 @@ echo "🧹 Resetting SDR++ config directory..."
 rm -rf ~/.config/sdrpp
 mkdir -p ~/.config/sdrpp
 
-echo "📦 Unpacking config into ~/.config/sdrpp..."
-unzip -oq /tmp/sdrppConfig.zip -d ~/.config/sdrpp
+echo "📦 Unpacking config into ~/.config/"
+unzip -oq /tmp/sdrppConfig.zip -d ~/.config/
 # ------------------------------------------------------------
 # Step 13: Build and install GQRX with RTL-SDR, HackRF, Airspy, Soapy PlutoSDR support
 # ------------------------------------------------------------
