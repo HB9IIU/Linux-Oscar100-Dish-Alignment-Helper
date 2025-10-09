@@ -2,6 +2,16 @@
 set -e
 
 
+# Update package list
+sudo apt-get update -y
+
+# Upgrade all installed packages automatically
+sudo apt-get upgrade -y
+
+# Remove unused packages
+sudo apt-get autoremove -y
+
+
 SERVICE_NAME="encoderServiceForSDRpp"
 USER_SYSTEMD_DIR="$HOME/.config/systemd/user"
 SERVICE_FILE="${USER_SYSTEMD_DIR}/${SERVICE_NAME}.service"
@@ -62,3 +72,14 @@ EOF
 
 echo "📡 Done!"
 echo "SDR++ will now launch automatically with your desktop session."
+
+WALLPAPER_URL="https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/HDwallpaper.png"
+DEST="$HOME/Pictures/oscar100_wallpaper.png"
+
+# Download the wallpaper
+wget -O "$DEST" "$WALLPAPER_URL"
+
+# Apply wallpaper (stretch to screen)
+pcmanfm --set-wallpaper "$DEST" --wallpaper-mode=stretch
+
+echo "✅ Wallpaper installed and set!"
