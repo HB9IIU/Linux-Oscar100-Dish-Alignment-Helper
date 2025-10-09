@@ -33,8 +33,8 @@ sudo apt install -y cmake build-essential pkg-config git
 cmake --version && git --version
 
 echo "📥 Installing VOLK (Vector Optimized Library of Kernels)..."
-sudo apt install -y libvolk-dev
-dpkg -s libvolk-dev >/dev/null && echo "✅ volk installed"
+sudo apt install -y libvolk2-dev
+dpkg -s libvolk2-dev >/dev/null && echo "✅ volk installed"
 
 echo "📥 Installing Zstandard compression library..."
 sudo apt install -y libzstd-dev
