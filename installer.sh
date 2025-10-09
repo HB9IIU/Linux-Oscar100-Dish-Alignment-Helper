@@ -455,6 +455,7 @@ else
 fi
 
 
+
 # Update package list
 sudo apt-get update -y
 
@@ -526,6 +527,16 @@ EOF
 echo "📡 Done!"
 echo "SDR++ will now launch automatically with your desktop session."
 
+WALLPAPER_URL="https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/HDwallpaper.png"
+DEST="$HOME/Pictures/oscar100_wallpaper.png"
+
+# Download the wallpaper
+wget -O "$DEST" "$WALLPAPER_URL"
+
+# Apply wallpaper (stretch to screen)
+pcmanfm --set-wallpaper "$DEST" --wallpaper-mode=stretch
+
+echo "✅ Wallpaper installed and set!"
 
 
 # --- print elapsed time ---
