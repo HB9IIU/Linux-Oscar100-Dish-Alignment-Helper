@@ -31,7 +31,7 @@ EXCLUDE_KHZ      = 3.0
 
 OFFSET_FILE = "lnb_offset.txt"
 
-DISPLAY_OFFSET_MHZ = 10000.0
+DISPLAY_OFFSET_MHZ = 0.0
 # -------------------------------------------------------------------
 
 class SDRWorker(QtCore.QThread):
