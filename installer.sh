@@ -229,7 +229,10 @@ echo "✅ DishAligner scripts ready in $APP_DIR"
 # ------------------------------------------------------------
 # HB9IIU Launchers (NB / WB / Buttons) via xdg-desktop-icon
 # ------------------------------------------------------------
-set -e
+curl -L -o "$APP_DIR/HB9IIU_Aligner.py" \
+  https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/HB9IIU_Aligner.py
+
+
 
 echo "🖥️ Creating HB9IIU Desktop launchers..."
 
@@ -555,6 +558,10 @@ echo "✅ Wallpaper installed and set!"
 
 
 # MENU
+echo "📥 Downloading touchLauncher.py..."
+curl -L -o "$APP_DIR/touchLauncher.py" \
+  https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/touchLauncher.py
+
 
 APP_NAME="HB9IIU Menu"
 APP_DIR="$HOME/hb9iiu_dishaligner"

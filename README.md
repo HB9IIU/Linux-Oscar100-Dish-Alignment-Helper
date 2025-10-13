@@ -118,6 +118,7 @@ Most SDRs need a small frequency correction before the beacon appears at the exa
   </a>
 </p>
 > If the thumbnail doesn’t load, use the direct link: https://www.youtube.com/watch?v=0tdZihSDElc
+
 ## Hardware
 
 - **Displays tested**
