@@ -42,7 +42,7 @@ For the **final peaking**, switch the LNB to **18 V** and view the **DATV (WB) b
 
 ## BONUS: SDR++ Monitor + Dual Encoders
 
-Since the Raspberry Pi has a proper display and enough CPU, the image includes a **fully pre-configured SDR++** setup.  
+Since the Raspberry Pi has a proper display and enough CPU, the project includes a **fully pre-configured SDR++** setup.  
 You can use the device as a compact **QO-100 desktop monitor** with full RX capabilities.
 
 ### Hardware controls (dual encoders)
@@ -52,6 +52,7 @@ Two rotary encoders are included for easier operation:
 - **Fine tuning:** smooth frequency nudging
 - **Volume control:** quick audio level adjustment
 - **Beacon centering (click):** press to snap the tuned frequency to the beacon center
+- **Quit application (click):** press upper encoder to Quit 
 
 ### Audio: Bluetooth speaker
 
@@ -111,8 +112,11 @@ Most SDRs need a small frequency correction before the beacon appears at the exa
 
 ## Demo
 
-[![Demo — click to play](https://img.youtube.com/vi/0tdZihSDElc/hqdefault.jpg)](https://www.youtube.com/watch?v=0tdZihSDElc "Demo — click to play")
-
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=0tdZihSDElc" title="Demo — click to play">
+    <img src="https://img.youtube.com/vi/0tdZihSDElc/hqdefault.jpg" alt="Demo — click to play">
+  </a>
+</p>
 > If the thumbnail doesn’t load, use the direct link: https://www.youtube.com/watch?v=0tdZihSDElc
 ## Hardware
 
