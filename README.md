@@ -108,3 +108,9 @@ Most SDRs need a small frequency correction before the beacon appears at the exa
 
 - **In the Python NB monitor:** Use the **± offset** buttons to nudge the frequency until the beacon is centered.  
   *(The set values are saved and automatically restored next time you start.)*
+
+## Demo
+
+[![Demo — click to play](https://img.youtube.com/vi/0tdZihSDElc/hqdefault.jpg)](https://www.youtube.com/watch?v=0tdZihSDElc "Demo — click to play")
+
+> If the thumbnail doesn’t load, use the direct link: https://www.youtube.com/watch?v=0tdZihSDElc
