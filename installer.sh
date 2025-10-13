@@ -222,6 +222,9 @@ echo "📥 Downloading WBfinal.py..."
 curl -L -o "$APP_DIR/WBfinal.py" \
   https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/WBfinal.py
 
+echo "📥 Downloading HB9IIU_Aligner.png..."
+curl -L -o "$APP_DIR/HB9IIU_Aligner.png" \
+  https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/HB9IIU_Aligner.png
 
 
 echo "✅ DishAligner scripts ready in $APP_DIR"
