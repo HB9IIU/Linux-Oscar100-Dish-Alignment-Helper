@@ -244,13 +244,10 @@ if [ -z "${APP_DIR:-}" ] || [ -z "${ICON_PNG:-}" ]; then
   exit 1
 fi
 
-# Prefer venv python if present, else system python3
-if [ -x "$APP_DIR/bin/python3" ]; then
-  PY="$APP_DIR/bin/python3"
-else
-  PY="$(command -v python3 || true)"
-fi
-[ -n "$PY" ] || { echo "❌ python3 not found."; exit 1; }
+ICON_PNG="$APP_DIR/HB9IIU_Aligner.png"
+
+PY="$APP_DIR/bin/python3"
+
 
 # Helper to create+install a launcher
 make_launcher() {
@@ -569,7 +566,7 @@ APP_NAME="HB9IIU Menu"
 APP_DIR="$HOME/hb9iiu_dishaligner"
 PYTHON="$APP_DIR/bin/python3"
 APP_MAIN="$APP_DIR/touchLauncher.py"
-ICON_PATH="$APP_DIR/HB9IIU_Aligner.png"   # optional; if missing we’ll use a stock icon
+ICON_PATH="$APP_DIR/HB9IIU_Aligner.png"
 AUTOSTART_DIR="$HOME/.config/autostart"
 DESKTOP_FILE="$AUTOSTART_DIR/hb9iiu-dishaligner.desktop"
 # ----------------------
