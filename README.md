@@ -135,3 +135,16 @@ Most SDRs need a small frequency correction before the beacon appears at the exa
   - Short, good-quality **coax** and **USB** cables
   - Stable **12 V / 18 V** supply for the LNB *(I’ll soon publish my portable solution using two 3.6 V cells)*
 
+## Pictures
+
+<!-- Large -->
+<p align="center">
+  <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/Setup.png" alt="" width="100%">
+</p>
+
+<!-- Three in a row -->
+<p align="center">
+  <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/3dRender1.png" alt="" width="32%">
+  <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/3dRender2.png" alt="" width="32%">
+  <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/3dRender3.png" alt="" width="32%">
+</p>
