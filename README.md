@@ -139,12 +139,10 @@ Most SDRs need a small frequency correction before the beacon appears at the exa
 
 <!-- Large -->
 <p align="center">
-  <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/Setup.png" alt="" width="100%">
+  <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/Setup.png?raw=1" alt="" width="100%">
 </p>
 
-<!-- Three in a row -->
-<p align="center">
-  <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/3dRender1.png" alt="" width="32%">
-  <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/3dRender2.png" alt="" width="32%">
-  <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/3dRender3.png" alt="" width="32%">
-</p>
+<!-- Three in a row (table) -->
+| | | |
+|:-:|:-:|:-:|
+| <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/3dRender1.png?raw=1" width="100%"/> | <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/3dRender2.png?raw=1" width="100%"/> | <img src="https://github.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/blob/main/Documentation/3dRender3.png?raw=1" width="100%"/> |
