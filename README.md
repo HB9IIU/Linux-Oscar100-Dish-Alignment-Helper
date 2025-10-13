@@ -92,3 +92,19 @@ High-quality audio is easy: pair a **Bluetooth speaker** with the Raspberry Pi a
    chmod 755 installer.sh
    bash installer.sh
 
+- The system will set up required packages, SDR drivers, and the QO-100 tools.
+- Installation time varies by Raspberry Pi model and network speed, but will take approx. 30 minutes!!!!
+
+## Source code
+
+- The source code for all Python apps is included in this repository for tweaking and customization.
+
+## First-time use
+
+Most SDRs need a small frequency correction before the beacon appears at the exact spot. Apply a correction in **both** SDR++ and the Python apps:
+
+- **In SDR++:** In the left pane under **Source**, adjust **PPM Correction** until the beacon aligns.  
+  *(Tip: press the lower encoder to snap/center on the beacon.)*
+
+- **In the Python NB monitor:** Use the **± offset** buttons to nudge the frequency until the beacon is centered.  
+  *(The set values are saved and automatically restored next time you start.)*
