@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets, QtCore
 import pyqtgraph as pg
 import SoapySDR
 from SoapySDR import *
-from pathlib import Path
+
 
 # -------------------------- USER SETTINGS --------------------------
 NB_LOWER_CW_DL  = 10489.500   # MHz
@@ -20,17 +20,16 @@ GAIN_TUNER  = 30
 GAIN_MIXER  = None
 GAIN_LNA    = None
 RTL_PPM     = 0.0
-AVG_FRAMES  = 8
+AVG_FRAMES  = 4
 
-DEFAULT_OFFSET= 50
-OFFSET_STEP_KHZ     = 0.05
-ZOOM_BEACON_FACTOR  = 0.012
+OFFSET_STEP_KHZ     = 0.1
+ZOOM_BEACON_FACTOR  = 0.025
 REPEAT_INTERVAL_MS  = 100
 
 NOISE_WINDOW_KHZ = 10.0
 EXCLUDE_KHZ      = 3.0
-MAX_Y_DB = 34
-OFFSET_FILE = Path(__file__).parent / "lnb_offset.txt"
+
+OFFSET_FILE = "lnb_offset.txt"
 
 DISPLAY_OFFSET_MHZ = 0.0
 # -------------------------------------------------------------------
@@ -61,6 +60,7 @@ class SDRWorker(QtCore.QThread):
                     args["serial"] = found[0]["serial"]
                 break
 
+        # ---- If nothing supported found → show error ----
         if not driver:
             print("[SDR] ERROR: No supported device found!")
             QtWidgets.QMessageBox.critical(
@@ -71,15 +71,17 @@ class SDRWorker(QtCore.QThread):
             return
 
         print(f"[SDR] Opening {driver} with args: {args}")
+        # build argument string e.g. "driver=rtlsdr,serial=00000001"
         arg_list = [f"{k}={v}" for k, v in args.items()]
         arg_str = ",".join(arg_list)
         sdr = SoapySDR.Device(arg_str)
-
+        # ---- Common setup ----
         try:
             sdr.setFrequencyCorrection(SOAPY_SDR_RX, 0, float(RTL_PPM))
         except Exception:
             pass
 
+        # ---- Device-specific setup ----
         if driver == "rtlsdr":
             sdr.setSampleRate(SOAPY_SDR_RX, 0, self.fs)
             sdr.setFrequency(SOAPY_SDR_RX, 0, self.fc)
@@ -103,6 +105,7 @@ class SDRWorker(QtCore.QThread):
             sdr.setSampleRate(SOAPY_SDR_RX, 0, self.fs)
             sdr.setFrequency(SOAPY_SDR_RX, 0, self.fc)
 
+        # ---- Streaming ----
         rx = sdr.setupStream(SOAPY_SDR_RX, SOAPY_SDR_CF32)
         sdr.activateStream(rx)
 
@@ -132,7 +135,7 @@ class SpectrumViewer(QtWidgets.QWidget):
         super().__init__()
         self.fs, self.N = fs, N
 
-        # ---- Load absolute offset (kHz), create with 50.0 if missing)
+        # ---- Load absolute offset (kHz), create with 50.0 if missing
         self.offset_khz = self.load_offset()
 
         # ---- Nominal IF centers (fixed; markers use nominal DL minus 10 GHz for display)
@@ -147,6 +150,8 @@ class SpectrumViewer(QtWidgets.QWidget):
         # ---- Fullscreen UI
         self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
         self.showFullScreen()
+
+        # Force exact screen geometry (fixes right margin issue)
         screen = QtWidgets.QApplication.primaryScreen()
         rect = screen.geometry()
         self.setGeometry(rect)
@@ -162,12 +167,11 @@ class SpectrumViewer(QtWidgets.QWidget):
         self.plot.setLabel("bottom", "Frequency (MHz)")
         self.plot.setLabel("left", "SNR (dB)")
         layout.addWidget(self.plot)
-
         # Force axis text and lines to solid white
         for axis in ("bottom", "left"):
             ax = self.plot.getAxis(axis)
-            ax.setTextPen(pg.mkPen(color=(255, 255, 255)))
-            ax.setPen(pg.mkPen(color=(255, 255, 255)))
+            ax.setTextPen(pg.mkPen(color=(255, 255, 255)))  # tick labels
+            ax.setPen(pg.mkPen(color=(255, 255, 255)))  # axis line + ticks
 
         # Custom ticks
         ax = self.plot.getAxis('bottom')
@@ -194,44 +198,33 @@ class SpectrumViewer(QtWidgets.QWidget):
             pen=pg.mkPen(color=self.colors[self.color_index], width=1)
         )
 
-        # ---- Markers (CW as cyan infinite lines)
+        # ---- Markers
         self.line_cw_lo = pg.InfiniteLine(pos=self.nb_lower_disp, angle=90, pen=pg.mkPen('c', width=2))
+        self.line_bpsk  = pg.InfiniteLine(pos=self.nb_bpsk_disp,  angle=90, pen=pg.mkPen('g', width=2))
         self.line_cw_hi = pg.InfiniteLine(pos=self.nb_upper_disp, angle=90, pen=pg.mkPen('c', width=2))
         self.plot.addItem(self.line_cw_lo)
+        self.plot.addItem(self.line_bpsk)
         self.plot.addItem(self.line_cw_hi)
-
-        # ---- Beacon decorations (short line + centered HTML labels)
-        self.beacon_line = self.plot.plot(  # vertical segment; y is set dynamically
-            [self.nb_bpsk_disp, self.nb_bpsk_disp],
-            [0, 0],
-            pen=pg.mkPen('g', width=2)
-        )
-
-        self.beacon_label = pg.TextItem(
-            html='<div style="font-size:22pt; font-weight:200; color:#00ff00;">Beacon</div>',
-            anchor=(0.5, 0.0)  # top-center anchor
-        )
-        self.plot.addItem(self.beacon_label)
-
-        self.offset_text = pg.TextItem(
-            html=f'<div style="font-size:10pt; color:#fff;">Offset: {self.offset_khz:.1f} kHz</div>',
-            anchor=(0.5, 0.0)  # top-center anchor
-        )
-        self.plot.addItem(self.offset_text)
 
         # ---- View ranges
         self.full_span = (self.nb_lower_disp, self.nb_upper_disp)
         self.plot.setXRange(*self.full_span, padding=0)
-        self.plot.setYRange(0, MAX_Y_DB)
+        self.plot.setYRange(0, 32)
         self.plot.setMouseEnabled(x=True, y=False)
-
-        # keep decorations updated on pan/zoom
-        self.plot.getViewBox().sigRangeChanged.connect(lambda *_: self._update_beacon_decor())
 
         # ---- Noise reference
         self.noise_line = pg.InfiniteLine(angle=0, pos=0.0,
                                           pen=pg.mkPen('y', style=QtCore.Qt.DashLine))
         self.plot.addItem(self.noise_line)
+
+        # ---- Offset label
+        self.offset_text = pg.TextItem(
+            text=f"Offset: {self.offset_khz:.1f} kHz",
+            color='w',
+            anchor=(1, 0)
+        )
+        self.plot.addItem(self.offset_text)
+        self.offset_text.setPos(self.full_span[1], 30)
 
         # ---- Averaging
         self.fft_buffer = np.zeros((AVG_FRAMES, self.N))
@@ -272,9 +265,6 @@ class SpectrumViewer(QtWidgets.QWidget):
         self.worker.new_data.connect(self.update_curve)
         self.worker.start()
 
-        # initial placement of decorations
-        self._update_beacon_decor()
-
         print(f"[INIT] Offset (kHz) loaded: {self.offset_khz:.3f}")
 
     # ---------------- Persistence ----------------
@@ -287,13 +277,13 @@ class SpectrumViewer(QtWidgets.QWidget):
                 print(f"[LOAD] {OFFSET_FILE} = '{raw}' -> {val:.3f} kHz")
                 return val
             except Exception as e:
-                print(f"[LOAD] Failed ({e}); using DEFAULT_OFFSET Hz")
-                self.save_offset(DEFAULT_OFFSET)
-                return DEFAULT_OFFSET
+                print(f"[LOAD] Failed ({e}); using 50.0 kHz")
+                self.save_offset(50.0)
+                return 50.0
         else:
-            print(f"[LOAD] No {OFFSET_FILE}; using DEFAULT_OFFSET Hz")
+            print(f"[LOAD] No {OFFSET_FILE}; creating with 50.0 kHz")
             self.save_offset(50.0)
-            return DEFAULT_OFFSET
+            return 50.0
 
     def save_offset(self, val=None):
         if val is not None:
@@ -319,38 +309,9 @@ class SpectrumViewer(QtWidgets.QWidget):
             y = self.curve.yData if self.curve.yData is not None else np.full(self.N, -50.0)
             self.curve.setData(self.freq_axis_disp, y)
 
-        # update labels/segment after axis changes
         if hasattr(self, "offset_text"):
-            self._update_beacon_decor()
-
-    # ---- Beacon decorations placement ----
-    def _update_beacon_decor(self):
-        # current view ranges
-        (xmin, xmax), (ymin, ymax) = self.plot.getViewBox().viewRange()
-        x = self.nb_bpsk_disp
-
-        # vertical layout, measured in dB units down from top
-        top_margin   = 0.2   # gap from top
-        label_gap    = 3   # gap between Beacon and Offset labels
-        line_gap     =3  # gap between Offset label and line top
-        line_bottom  = max(0.0, ymin)  # baseline to draw the vertical segment up from
-
-        beacon_y     = ymax - top_margin          # "Beacon" (top of text)
-        offset_y     = beacon_y - label_gap
-        line_top_y   = offset_y - line_gap
-
-        # safety clamp if the view is tiny
-        if line_top_y <= line_bottom:
-            line_top_y = (ymin + ymax) * 0.6
-
-        # update visuals
-        self.beacon_line.setData([x, x], [line_bottom, line_top_y])
-        self.beacon_label.setPos(x, beacon_y)
-        self.offset_text.setPos(x, offset_y)
-        # refresh offset text content (HTML)
-        self.offset_text.setHtml(
-            f'<div style="font-size:10pt; color:#fff;">Offset: {self.offset_khz:.1f} kHz</div>'
-        )
+            self.offset_text.setPos(self.full_span[1], 30)
+            self.offset_text.setText(f"Offset: {self.offset_khz:.1f} kHz")
 
     # ---------------- Spectrum update ----------------
     def update_curve(self, P_db):

@@ -229,18 +229,24 @@ echo "✅ DishAligner scripts ready in $APP_DIR"
 # ------------------------------------------------------------
 # Step 10: Add custom icons + desktop launchers for Aligner tools
 # ------------------------------------------------------------
+set -euo pipefail
+
 APP_DIR="$HOME/hb9iiu_dishaligner"
-DESKTOP_DIR="$HOME/Desktop"
+# Prefer XDG desktop dir if available
+DESKTOP_DIR="$(command -v xdg-user-dir >/dev/null 2>&1 && xdg-user-dir DESKTOP || echo "$HOME/Desktop")"
+
 mkdir -p "$APP_DIR" "$DESKTOP_DIR"
 
 ICON_PNG="$APP_DIR/HB9IIU_Aligner.png"
 
 echo "📥 Downloading application icon..."
+# Canonical RAW URL (no refs/heads)
 curl -fsSL -o "$ICON_PNG" \
-  https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/HB9IIU_Aligner.png
+  "https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/main/HB9IIU_Aligner.png"
 
 DESKTOP_FILE_NB="$DESKTOP_DIR/HB9IIU NB Monitor.desktop"
 DESKTOP_FILE_WB="$DESKTOP_DIR/HB9IIU WB Monitor.desktop"
+DESKTOP_FILE_BUTTON_LAUNCHER="$DESKTOP_DIR/HB9IIU Launcher.desktop"
 
 # ------------------------------------------------------------
 # Narrow Band launcher
@@ -284,11 +290,35 @@ if command -v gio >/dev/null 2>&1; then
   gio set "$DESKTOP_FILE_WB" metadata::trusted true || true
 fi
 
+# ------------------------------------------------------------
+# Button Launcher
+# ------------------------------------------------------------
+echo "🖥️ Creating Buttons launcher..."
+cat > "$DESKTOP_FILE_BUTTON_LAUNCHER" <<EOF
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=HB9IIU Buttons Launcher
+Comment=HB9IIU Dish Aligner - Buttons Launcher
+Exec=$APP_DIR/bin/python3 $APP_DIR/touchLauncher.py
+Icon=$ICON_PNG
+Terminal=false
+Categories=Utility;
+EOF
+
+# FIX: use the variable, not a string
+chmod +x "$DESKTOP_FILE_BUTTON_LAUNCHER"
+if command -v gio >/dev/null 2>&1; then
+  gio set "$DESKTOP_FILE_BUTTON_LAUNCHER" metadata::trusted true || true
+fi
+
 # Refresh desktop if PCManFM is running
 if pgrep -x pcmanfm >/dev/null 2>&1; then
   echo "🔄 Refreshing PCManFM..."
   pcmanfm --reconfigure >/dev/null 2>&1 || true
 fi
+
+echo "✅ Desktop launchers created in: $DESKTOP_DIR"
 
 # ------------------------------------------------------------
 # Step 11: Enable VNC service
@@ -537,6 +567,46 @@ wget -O "$DEST" "$WALLPAPER_URL"
 pcmanfm --set-wallpaper "$DEST" --wallpaper-mode=stretch
 
 echo "✅ Wallpaper installed and set!"
+
+
+# MENU
+
+APP_NAME="HB9IIU Menu"
+APP_DIR="$HOME/hb9iiu_dishaligner"
+PYTHON="$APP_DIR/bin/python3"
+APP_MAIN="$APP_DIR/touchLauncher.py"
+ICON_PATH="$APP_DIR/HB9IIU_Aligner.png"   # optional; if missing we’ll use a stock icon
+AUTOSTART_DIR="$HOME/.config/autostart"
+DESKTOP_FILE="$AUTOSTART_DIR/hb9iiu-dishaligner.desktop"
+# ----------------------
+
+echo "📝 Creating autostart entry at: $DESKTOP_FILE"
+mkdir -p "$AUTOSTART_DIR"
+
+# Pick an icon that exists
+ICON="utilities-terminal"
+[ -f "$ICON_PATH" ] && ICON="$ICON_PATH"
+
+# Basic sanity checks (don’t fail hard, just warn)
+[ -x "$PYTHON" ] || echo "⚠️  Warning: Python not found/executable at $PYTHON"
+[ -f "$APP_MAIN" ] || echo "⚠️  Warning: App not found at $APP_MAIN"
+
+cat > "$DESKTOP_FILE" <<EOF
+[Desktop Entry]
+Type=Application
+Name=$APP_NAME
+Comment=Start $APP_NAME automatically on login
+TryExec=$PYTHON
+Exec=$PYTHON $APP_MAIN
+Icon=$ICON
+Terminal=false
+X-GNOME-Autostart-enabled=true
+Categories=Utility;HamRadio;
+EOF
+
+echo "📡 Done!"
+echo "➡️  $APP_NAME will launch automatically with your desktop session."
+echo "   To remove: rm -f \"$DESKTOP_FILE\""
 
 
 # --- print elapsed time ---
