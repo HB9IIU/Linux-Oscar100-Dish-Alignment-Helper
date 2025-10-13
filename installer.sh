@@ -227,98 +227,111 @@ curl -L -o "$APP_DIR/WBfinal.py" \
 echo "✅ DishAligner scripts ready in $APP_DIR"
 
 # ------------------------------------------------------------
-# Step 10: Add custom icons + desktop launchers for Aligner tools
+# HB9IIU Launchers (NB / WB / Buttons) via xdg-desktop-icon
 # ------------------------------------------------------------
-set -euo pipefail
+set -e
 
-APP_DIR="$HOME/hb9iiu_dishaligner"
-# Prefer XDG desktop dir if available
-DESKTOP_DIR="$(command -v xdg-user-dir >/dev/null 2>&1 && xdg-user-dir DESKTOP || echo "$HOME/Desktop")"
+echo "🖥️ Creating HB9IIU Desktop launchers..."
 
-mkdir -p "$APP_DIR" "$DESKTOP_DIR"
+# Resolve Desktop dir robustly (falls back to ~/Desktop)
+DESKTOP_DIR="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")"
+mkdir -p "$DESKTOP_DIR"
 
-ICON_PNG="$APP_DIR/HB9IIU_Aligner.png"
+# App + icon paths (expected to be exported by your script)
+# APP_DIR, ICON_PNG must already be set
+if [ -z "${APP_DIR:-}" ] || [ -z "${ICON_PNG:-}" ]; then
+  echo "❌ APP_DIR and ICON_PNG must be set before running this section."
+  exit 1
+fi
 
-echo "📥 Downloading application icon..."
-# Canonical RAW URL (no refs/heads)
-curl -fsSL -o "$ICON_PNG" \
-  "https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/main/HB9IIU_Aligner.png"
+# Prefer venv python if present, else system python3
+if [ -x "$APP_DIR/bin/python3" ]; then
+  PY="$APP_DIR/bin/python3"
+else
+  PY="$(command -v python3 || true)"
+fi
+[ -n "$PY" ] || { echo "❌ python3 not found."; exit 1; }
 
-DESKTOP_FILE_NB="$DESKTOP_DIR/HB9IIU NB Monitor.desktop"
-DESKTOP_FILE_WB="$DESKTOP_DIR/HB9IIU WB Monitor.desktop"
-DESKTOP_FILE_BUTTON_LAUNCHER="$DESKTOP_DIR/HB9IIU Launcher.desktop"
+# Helper to create+install a launcher
+make_launcher() {
+  local name="$1"           # e.g., "HB9IIU NB Monitor"
+  local basename="$2"       # e.g., "HB9IIU-NB"
+  local exec_cmd="$3"       # full Exec line (quoted appropriately)
+  local comment="$4"        # Comment field
 
-# ------------------------------------------------------------
-# Narrow Band launcher
-# ------------------------------------------------------------
-echo "🖥️ Creating Narrow Band launcher..."
-cat > "$DESKTOP_FILE_NB" <<EOF
+  local tmp="/tmp/${basename}.desktop"
+  local dest="${DESKTOP_DIR}/${basename}.desktop"
+
+  cat > "$tmp" <<EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=HB9IIU NB Monitor
-Comment=HB9IIU Dish Aligner - Narrow Band
-Exec=$APP_DIR/bin/python3 $APP_DIR/NBfinal.py
-Icon=$ICON_PNG
+Name=${name}
+Comment=${comment}
+TryExec=${PY}
+Exec=${exec_cmd}
+Icon=${ICON_PNG}
 Terminal=false
 Categories=Utility;
 EOF
 
-chmod +x "$DESKTOP_FILE_NB"
-if command -v gio >/dev/null 2>&1; then
-  gio set "$DESKTOP_FILE_NB" metadata::trusted true || true
-fi
+  # Ensure Unix line endings & executable bit
+  chmod +x "$tmp"
+  command -v dos2unix >/dev/null 2>&1 && dos2unix "$tmp" >/dev/null 2>&1 || true
 
-# ------------------------------------------------------------
-# Wide Band launcher
-# ------------------------------------------------------------
-echo "🖥️ Creating Wide Band launcher..."
-cat > "$DESKTOP_FILE_WB" <<EOF
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=HB9IIU WB Monitor
-Comment=HB9IIU Dish Aligner - Wide Band
-Exec=$APP_DIR/bin/python3 $APP_DIR/WBfinal.py
-Icon=$ICON_PNG
-Terminal=false
-Categories=Utility;
-EOF
+  # Install via xdg-utils
+  xdg-desktop-icon install --novendor "$tmp"
 
-chmod +x "$DESKTOP_FILE_WB"
-if command -v gio >/dev/null 2>&1; then
-  gio set "$DESKTOP_FILE_WB" metadata::trusted true || true
-fi
+  # Ensure the installed copy on Desktop is executable (prevents prompts)
+  if [ -f "$dest" ]; then
+    chmod +x "$dest"
+  else
+    # Some xdg-utils versions keep the original name
+    local alt="${DESKTOP_DIR}/$(basename "$tmp")"
+    if [ -f "$alt" ]; then
+      mv -f "$alt" "$dest"
+      chmod +x "$dest"
+    fi
+  fi
 
-# ------------------------------------------------------------
-# Button Launcher
-# ------------------------------------------------------------
-echo "🖥️ Creating Buttons launcher..."
-cat > "$DESKTOP_FILE_BUTTON_LAUNCHER" <<EOF
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=HB9IIU Buttons Launcher
-Comment=HB9IIU Dish Aligner - Buttons Launcher
-Exec=$APP_DIR/bin/python3 $APP_DIR/touchLauncher.py
-Icon=$ICON_PNG
-Terminal=false
-Categories=Utility;
-EOF
+  echo "✅ ${name} → $dest"
+}
 
-# FIX: use the variable, not a string
-chmod +x "$DESKTOP_FILE_BUTTON_LAUNCHER"
-if command -v gio >/dev/null 2>&1; then
-  gio set "$DESKTOP_FILE_BUTTON_LAUNCHER" metadata::trusted true || true
-fi
+# --------- Create the three launchers ---------
 
-# Refresh desktop if PCManFM is running
-if pgrep -x pcmanfm >/dev/null 2>&1; then
+# Narrow Band
+make_launcher \
+  "HB9IIU NB Monitor" \
+  "HB9IIU-NB" \
+  "\"$PY\" \"$APP_DIR/NBfinal.py\"" \
+  "HB9IIU Dish Aligner - Narrow Band"
+
+# Wide Band
+make_launcher \
+  "HB9IIU WB Monitor" \
+  "HB9IIU-WB" \
+  "\"$PY\" \"$APP_DIR/WBfinal.py\"" \
+  "HB9IIU Dish Aligner - Wide Band"
+
+# Buttons Launcher
+make_launcher \
+  "HB9IIU Launcher" \
+  "HB9IIU-Buttons" \
+  "\"$PY\" \"$APP_DIR/touchLauncher.py\"" \
+  "HB9IIU Dish Aligner - Launcher"
+
+#  refresh PCManFM-Qt if running
+if pgrep -x pcmanfm-qt >/dev/null 2>&1; then
+  echo "🔄 Refreshing PCManFM-Qt..."
+  pcmanfm-qt --reconfigure >/dev/null 2>&1 || true
+elif pgrep -x pcmanfm >/dev/null 2>&1; then
   echo "🔄 Refreshing PCManFM..."
   pcmanfm --reconfigure >/dev/null 2>&1 || true
 fi
 
-echo "✅ Desktop launchers created in: $DESKTOP_DIR"
+echo "🎉 All launchers installed to: $DESKTOP_DIR"
+echo "Tip: In File Manager → Preferences → Behavior, enable “Launch executable files without prompt.”"
+
 
 # ------------------------------------------------------------
 # Step 11: Enable VNC service
@@ -537,25 +550,6 @@ sudo loginctl enable-linger "$(whoami)"
 echo "📡 Done!"
 echo "Check status with: systemctl --user status ${SERVICE_NAME}.service"
 
-
-
-AUTOSTART_DIR="$HOME/.config/autostart"
-AUTOSTART_FILE="${AUTOSTART_DIR}/sdrpp.desktop"
-
-echo "📝 Creating SDR++ autostart entry at ${AUTOSTART_FILE}..."
-mkdir -p "${AUTOSTART_DIR}"
-cat > "${AUTOSTART_FILE}" <<EOF
-[Desktop Entry]
-Type=Application
-Name=SDR++
-Exec=/usr/bin/sdrpp --autostart
-Comment=Start SDR++ automatically
-X-GNOME-Autostart-enabled=true
-Categories=AudioVideo;HamRadio;
-EOF
-
-echo "📡 Done!"
-echo "SDR++ will now launch automatically with your desktop session."
 
 WALLPAPER_URL="https://raw.githubusercontent.com/HB9IIU/Linux-Oscar100-Dish-Alignment-Helper/refs/heads/main/HDwallpaper.png"
 DEST="$HOME/Pictures/oscar100_wallpaper.png"
