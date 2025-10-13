@@ -237,12 +237,6 @@ echo "🖥️ Creating HB9IIU Desktop launchers..."
 DESKTOP_DIR="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")"
 mkdir -p "$DESKTOP_DIR"
 
-# App + icon paths (expected to be exported by your script)
-# APP_DIR, ICON_PNG must already be set
-if [ -z "${APP_DIR:-}" ] || [ -z "${ICON_PNG:-}" ]; then
-  echo "❌ APP_DIR and ICON_PNG must be set before running this section."
-  exit 1
-fi
 
 ICON_PNG="$APP_DIR/HB9IIU_Aligner.png"
 
