@@ -114,3 +114,24 @@ Most SDRs need a small frequency correction before the beacon appears at the exa
 [![Demo — click to play](https://img.youtube.com/vi/0tdZihSDElc/hqdefault.jpg)](https://www.youtube.com/watch?v=0tdZihSDElc "Demo — click to play")
 
 > If the thumbnail doesn’t load, use the direct link: https://www.youtube.com/watch?v=0tdZihSDElc
+## Hardware
+
+- **Displays tested**
+  - Raspberry Pi **Official 7" Touchscreen**
+  - Waveshare **4.3" HDMI LCD** (used in the demo video)  
+    *I designed a 3D-printed enclosure for this panel; the build shown in the video uses that case.*  
+    The repository also includes my **STL files** for 3D printing  
+    *(Autodesk Fusion 360 project: https://a360.co/3IGViGW)*
+
+- **Rotary encoders**
+  - Two low-cost 360° rotary encoders (e.g., **KY-040** type) with push-switch  
+    *Used for fine tuning, volume, **beacon-centering on press**, and **QUIT**.*
+
+- **Typical RF chain**
+  - Dish + **LNB** → **Bias-T / power inserter** (12 V for NB, 18 V for WB) → **SDR** (RTL-SDR / Airspy R2 / HackRF) → **Raspberry Pi**
+
+- **Nice-to-haves**
+  - Small **Bluetooth speaker** for audio
+  - Short, good-quality **coax** and **USB** cables
+  - Stable **12 V / 18 V** supply for the LNB *(I’ll soon publish my portable solution using two 3.6 V cells)*
+
